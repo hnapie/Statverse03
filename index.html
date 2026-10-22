@@ -85,15 +85,15 @@ img.pv{max-width:100%;max-height:260px;border-radius:12px;margin-top:8px}
     <img id="pv" class="pv" hidden alt="Ảnh đề">
     <p class="tag" style="margin-top:12px">Xem trước (đã render KaTeX)</p><div id="prev" class="msg card"></div>
     <div class="st" id="s1st"></div><button class="btn" id="n1">Tiếp tục</button></div>
-  <div id="s2" hidden><h2>Bước 2. Bạn đã hiểu đề bài đến đâu?</h2><div id="lv"></div><button class="btn" id="n2">Tiếp tục</button></div>
+  <div id="s2" hidden><h2>Bước 2. Bạn đã hiểu đề bài đến đâu?</h2><div id="lv"></div><button class="btn g" id="b2">← Quay lại</button> <button class="btn" id="n2">Tiếp tục</button></div>
   <div id="s3" hidden><h2>Bước 3. Chọn chế độ hỗ trợ</h2><div id="md"></div>
     <div id="chkbox" hidden><p>Dán lời giải/đáp án của bạn để AI kiểm tra:</p><textarea id="mine"></textarea></div>
-    <button class="btn" id="n3">Giải ngay</button></div>
+    <button class="btn g" id="b3">← Quay lại</button> <button class="btn" id="n3">Giải ngay</button></div>
   <div id="s4" hidden><h2>Bước 4. Lời giải theo quy trình 4 bước</h2><div class="st" id="s4st"></div><div id="sol"></div>
     <button class="btn g" id="speak">🔊 Nghe lời giải</button> <button class="btn g" id="stop">⏹ Dừng</button>
-    <button class="btn" id="n4">Tiếp tục</button></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn g" id="b4">↩ Sửa đề / chọn lại</button><button class="btn g" id="nw4">📷 Giải bài khác</button><button class="btn" id="n4">Tiếp tục</button></div></div>
   <div id="s5" hidden><h2>Bước 5. Luyện tập thêm</h2><p>Bạn có muốn luyện tập thêm về dạng bài này không?</p>
-    <a class="btn g" href="#home" style="text-decoration:none;display:inline-block">Không – Quay về trang chủ</a>
+    <button class="btn" id="nw5">📷 Giải bài khác (chụp / nhập mới)</button> <a class="btn g" href="#home" style="text-decoration:none;display:inline-block">Không – Quay về trang chủ</a>
     <a class="btn" href="#game" id="yes" style="text-decoration:none;display:inline-block">Có – Chơi trò chơi</a></div>
   </div>
 </section>
@@ -238,7 +238,7 @@ $("#img").onchange=async e=>{const f=e.target.files[0];if(!f)return;const st=$("
     setImg("image/jpeg",cv.toDataURL("image/jpeg",.85));st.textContent="PDF dạng quét: đã chuyển trang 1 thành ảnh. Bấm “Nhận dạng đề từ ảnh”."}}
   else if(/^image\//.test(f.type)){const rd=new FileReader();rd.onload=()=>{setImg(f.type,rd.result);st.textContent="Đã nhận ảnh. Bấm “Nhận dạng đề từ ảnh”."};rd.readAsDataURL(f)}
   else throw new Error("Chỉ nhận ảnh, .docx hoặc PDF.")}
- catch(er){st.textContent="Lỗi: "+er.message}};
+ catch(er){st.textContent="Lỗi: "+er.message}finally{try{e.target.value=""}catch(x){}}};
 /* Micro nhập đề */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
 const SAY=[[/xích[- ]?ma bình phương/gi,"\\(\\sigma^2\\)"],[/xích[- ]?ma/gi,"\\(\\sigma\\)"],[/\bmu\b|\bmiu\b/gi,"\\(\\mu\\)"],[/lam[- ]?đa/gi,"\\(\\lambda\\)"],[/khi bình phương/gi,"\\(\\chi^2\\)"],[/xác suất của ([A-Z]) với điều kiện ([A-Z])/g,"\\(P($1\\mid $2)\\)"],[/xác suất của ([A-Z])/g,"\\(P($1)\\)"],[/(\w) gạch ngang/g,"\\(\\bar{$1}\\)"]];
@@ -260,10 +260,16 @@ const LV=["Tôi chưa hiểu đề bài","Tôi hiểu đề nhưng chưa biết 
 const MD=[["GỢI Ý","Gợi ý từng phần, không lộ toàn bộ lời giải"],["HƯỚNG DẪN","Phân tích đề, hướng dẫn từng bước và lý do chọn công thức"],["KIỂM TRA","Bạn nhập lời giải, AI chỉ lỗi sai và cách sửa"],["GIẢI ĐẦY ĐỦ","Lời giải chi tiết từ đầu đến cuối"]];
 let lv=3,md=3,solText="";
 function opts(box,arr,get,set){box.textContent="";arr.forEach((a,i)=>{const b=document.createElement("button");b.className="opt"+(get()===i?" on":"");b.textContent=Array.isArray(a)?a[0]+" — "+a[1]:a;b.onclick=()=>{set(i);opts(box,arr,get,set);if(box.id==="md")$("#chkbox").hidden=md!==2};box.appendChild(b)})}
-function go(n){["s1","s2","s3","s4","s5"].forEach((s,i)=>$("#"+s).hidden=i!==n-1);$$("#stepbar i").forEach((x,i)=>x.classList.toggle("on",i<n))}
+let cur=1;function go(n){cur=n;["s1","s2","s3","s4","s5"].forEach((s,i)=>$("#"+s).hidden=i!==n-1);$$("#stepbar i").forEach((x,i)=>x.classList.toggle("on",i<n))}
 $("#n1").onclick=()=>{if(!$("#prob").value.trim()&&!img){$("#s1st").textContent="Hãy nhập hoặc chụp đề bài trước.";return}
   if(/\[\?/.test($("#prob").value)&&!confirm("Đề còn chỗ chưa chắc chắn [?...]. Bạn đã kiểm tra chưa?"))return;go(2)};
 $("#n2").onclick=()=>go(3);$("#n3").onclick=solve;$("#n4").onclick=()=>go(5);
+$("#b2").onclick=()=>go(1);$("#b3").onclick=()=>go(2);$("#b4").onclick=()=>{stopSpeak();go(1)};
+function newProblem(){stopSpeak();$("#prob").value="";$("#mine").value="";img=null;$("#pv").hidden=true;$("#pv").removeAttribute("src");$("#ocr").disabled=true;$("#img").value="";$("#cam").value="";
+ $("#s1st").textContent="";$("#s4st").textContent="";$("#sol").textContent="";solText="";lv=3;md=3;$("#chkbox").hidden=true;
+ opts($("#lv"),LV,()=>lv,i=>lv=i);opts($("#md"),MD,()=>md,i=>md=i);prev();go(1);window.scrollTo(0,0)}
+$("#nw4").onclick=newProblem;$("#nw5").onclick=newProblem;
+$$('a[href="#solve"]').forEach(a=>a.addEventListener("click",()=>{if(cur>=4)newProblem()}));
 opts($("#lv"),LV,()=>lv,i=>lv=i);opts($("#md"),MD,()=>md,i=>md=i);
 const SOLVE_SYS=`Bạn là gia sư Xác suất Thống kê đại học, người Việt, kiên nhẫn, chính xác. Chỉ hỗ trợ môn Xác suất Thống kê; ngoài phạm vi thì từ chối lịch sự. Trả lời tiếng Việt.
 QUY TẮC KÝ HIỆU: mọi công thức viết bằng LaTeX trong \\( ... \\) (nội dòng) hoặc \\[ ... \\] (riêng dòng). Không viết chữ đọc tên ký hiệu (alpha, sigma...) thay cho ký hiệu. Không dùng markdown (không **, không #, không bảng markdown).
@@ -286,22 +292,37 @@ function render4(t){const box=$("#sol");box.textContent="";const parts=t.split(/
     const d=document.createElement("details");d.open=true;const s=document.createElement("summary");s.textContent="Bước "+parts[i]+" — "+(nl<0?body:body.slice(0,nl));
     const c=document.createElement("div");c.className="msg";c.textContent=nl<0?"":body.slice(nl+1).trim();d.append(s,c);box.appendChild(d);mr(c)}}
 
-/* ===== Đọc tiếng Việt (TTS) với bộ chuẩn hóa ký hiệu ===== */
-function normSpeech(t){return t.replace(/@@BUOC(\d)/g,"Bước $1").replace(/\\\[|\\\]|\\\(|\\\)|\$\$/g," ")
+/* ===== Đọc tiếng Việt (TTS): ưu tiên giọng Google/Microsoft tiếng Việt, đọc từng đoạn ngắn ===== */
+/*TTS-START*/
+const UMAP={"σ":"xích-ma","ε":"ép-xi-lon","μ":"mu","λ":"lam-đa","α":"an-pha","β":"bê-ta","χ":"khi","Φ":"phi","φ":"phi","Σ":"tổng","∫":"tích phân","√":"căn bậc hai của ","²":" bình phương","³":" lập phương","≤":" nhỏ hơn hoặc bằng ","≥":" lớn hơn hoặc bằng ","≈":" xấp xỉ ","≠":" khác ","∪":" hợp ","∩":" giao ","⇒":" suy ra ","→":" suy ra ","∈":" thuộc ","±":" cộng trừ ","×":" nhân ","·":" nhân ","÷":" chia ","∣":" với điều kiện ","|":" với điều kiện ","∞":" vô cực "};
+function normSpeech(t){t=t.replace(/@@BUOC(\d)/g,"Bước $1").replace(/\\\[|\\\]|\\\(|\\\)|\$\$/g," ")
  .replace(/\\operatorname\{Var\}/g,"phương sai").replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g,"$1 trên $2").replace(/\\sqrt\{([^{}]*)\}/g,"căn bậc hai của $1")
  .replace(/\\bar\{(\w)\}/g,"$1 gạch ngang").replace(/\\hat\{(\w)\}/g,"$1 mũ").replace(/\\overline\{(\w)\}/g,"phần bù của $1")
- .replace(/\\Phi_0/g,"phi không").replace(/\\Phi/g,"phi").replace(/\\varphi/g,"phi nhỏ").replace(/\\chi\^2/g,"khi bình phương").replace(/\\sigma\^2/g,"xích-ma bình phương")
+ .replace(/\\Phi_0/g,"phi không").replace(/\\Phi/g,"phi").replace(/\\chi\^2/g,"khi bình phương").replace(/\\sigma\^2/g,"xích-ma bình phương")
  .replace(/\\sigma/g,"xích-ma").replace(/\\mu/g,"mu").replace(/\\lambda/g,"lam-đa").replace(/\\alpha/g,"an-pha").replace(/\\beta/g,"bê-ta")
  .replace(/\\mid/g," với điều kiện ").replace(/\\cap/g," giao ").replace(/\\cup/g," hợp ").replace(/\\sum/g,"tổng").replace(/\\int/g,"tích phân")
- .replace(/\\le\b|\\leq/g," nhỏ hơn hoặc bằng ").replace(/\\ge\b|\\geq/g," lớn hơn hoặc bằng ").replace(/\\pm/g," cộng trừ ").replace(/\\approx/g," xấp xỉ ")
- .replace(/H_0/g,"H không").replace(/H_1/g,"H một").replace(/\^2/g," bình phương").replace(/_\{?([\w]+)\}?/g," $1 ").replace(/[{}\\^]/g," ")
- .replace(/[*#`]/g,"").replace(/(\d)\.(\d)/g,"$1 phẩy $2").replace(/\s+/g," ").trim()}
-function speak(t){if(!("speechSynthesis" in window))return alert("Trình duyệt không hỗ trợ đọc.");speechSynthesis.cancel();
-  const vs=speechSynthesis.getVoices(),v=vs.find(x=>/^vi/i.test(x.lang));
-  normSpeech(t).split(/(?<=[.!?;])\s+/).filter(Boolean).forEach(s=>{const u=new SpeechSynthesisUtterance(s);u.lang="vi-VN";if(v)u.voice=v;speechSynthesis.speak(u)});
-  if(!v)console.warn("Thiết bị chưa có giọng đọc tiếng Việt")}
-$("#speak").onclick=()=>solText&&speak(solText);$("#stop").onclick=()=>speechSynthesis.cancel();
-addEventListener("hashchange",()=>speechSynthesis.cancel());
+ .replace(/\\le\b|\\leq/g," nhỏ hơn hoặc bằng ").replace(/\\ge\b|\\geq/g," lớn hơn hoặc bằng ").replace(/\\pm/g," cộng trừ ").replace(/\\approx/g," xấp xỉ ").replace(/\\cdot|\\times/g," nhân ")
+ .replace(/H_?0/g,"H không").replace(/H_?1/g,"H một").replace(/\^2/g," bình phương").replace(/_\{?(\w+)\}?/g," $1 ").replace(/[{}\\^]/g," ");
+ t=t.replace(/(\w)\u0304/g,"$1 gạch ngang").replace(/(\w)\u0302/g,"$1 mũ").replace(/(\d),(\d)/g,"$1 phẩy $2").replace(/(\d)\.(\d)/g,"$1 phẩy $2").replace(/(\d)\s*%/g,"$1 phần trăm")
+  .replace(/(^|[\s(=;:,])[−-](?=\d)/g,"$1âm ").replace(/\s[−-]\s/g," trừ ").replace(/−/g," trừ ").replace(/=/g," bằng ").replace(/\+/g," cộng ").replace(/(\w)\/(\w)/g,"$1 trên $2");
+ t=t.replace(/\|([^|()]{1,15})\|/g," giá trị tuyệt đối của $1 ").replace(/>/g," lớn hơn ").replace(/</g," nhỏ hơn ").replace(/[σεμλαβχΦφΣ∫√²³≤≥≈≠∪∩⇒→∈±×·÷∣|∞]/g,c=>UMAP[c]||c);
+ return t.replace(/[*#`_~]/g," ").replace(/[()\[\]]/g," ").replace(/\//g," trên ").replace(/\s+/g," ").trim()}
+function chunk(t){const out=[];t.split(/(?<=[.!?:;])\s+|\n+/).forEach(s=>{s=s.trim();while(s.length>150){let i=s.lastIndexOf(",",150);if(i<40)i=s.lastIndexOf(" ",150);if(i<40)i=150;out.push(s.slice(0,i).trim());s=s.slice(i+1).trim()}if(s)out.push(s)});return out.filter(x=>/[\p{L}\d]/u.test(x))}
+/*TTS-END*/
+let VOICE=null,spk=0;
+function pickVoice(){if(!("speechSynthesis" in window))return null;const vs=speechSynthesis.getVoices().filter(v=>/^vi([-_]|$)/i.test(v.lang)||/vietnam|tiếng việt/i.test(v.name));
+ VOICE=vs.find(v=>/google/i.test(v.name))||vs.find(v=>/natural|online/i.test(v.name))||vs[0]||null;return VOICE}
+if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=pickVoice;pickVoice()}
+function note(m){const d=document.createElement("div");d.textContent=m;d.style.cssText="position:fixed;left:16px;bottom:16px;z-index:60;max-width:min(420px,calc(100vw - 32px));background:#0b1030;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px";document.body.appendChild(d);setTimeout(()=>d.remove(),7000)}
+function stopSpeak(){spk++;if("speechSynthesis" in window)speechSynthesis.cancel()}
+function speak(t){if(!("speechSynthesis" in window)){note("Trình duyệt không hỗ trợ đọc. Hãy dùng Chrome hoặc Edge.");return}
+ stopSpeak();const id=spk,v=pickVoice(),ch=chunk(normSpeech(t));if(!ch.length)return;
+ if(!v)note("Máy chưa có giọng tiếng Việt. Hãy dùng Chrome (giọng Google tiếng Việt) hoặc Edge; trên Windows cài thêm giọng ở Cài đặt → Thời gian & ngôn ngữ → Giọng nói.");
+ let i=0;const next=()=>{if(id!==spk||i>=ch.length)return;const u=new SpeechSynthesisUtterance(ch[i++]);u.lang="vi-VN";if(v)u.voice=v;u.rate=.95;u.onend=next;
+  u.onerror=e=>{if(e.error!=="canceled"&&e.error!=="interrupted"){console.warn("TTS:",e.error);next()}};speechSynthesis.speak(u)};
+ setTimeout(next,120)}
+$("#speak").onclick=()=>solText&&speak(solText);$("#stop").onclick=()=>stopSpeak();
+addEventListener("hashchange",()=>stopSpeak());
 
 /* ===== Laplace ===== */
 function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x))}
@@ -315,7 +336,7 @@ const CHAT_SYS=`Bạn là một bạn nữ người Việt học giỏi Xác su�
 const hist=[];
 $("#cbtn").onclick=()=>$("#cbox").classList.toggle("on");
 function bub(c,t){const d=document.createElement("div");d.className="b msg "+c;if(c==="a"){show(d,t);const s=document.createElement("button");s.textContent="🔊";s.style.cssText="background:none;border:0;cursor:pointer";s.onclick=()=>speak(t);d.appendChild(s)}else d.textContent=t;$("#clog").appendChild(d);$("#clog").scrollTop=1e9;return d}
-async function csend(){const i=$("#cin"),t=i.value.trim();if(!t)return;i.value="";speechSynthesis.cancel();bub("u",t);hist.push({role:"user",text:t});
+async function csend(){const i=$("#cin"),t=i.value.trim();if(!t)return;i.value="";stopSpeak();bub("u",t);hist.push({role:"user",text:t});
   const w=bub("a","Đang trả lời...");$("#csend").disabled=true;
   try{const a=await SM(CHAT_SYS,hist.slice(-12));hist.push({role:"model",text:a});w.remove();bub("a",a)}
   catch(e){w.textContent="⚠️ "+e.message;hist.pop()}finally{$("#csend").disabled=false}}
@@ -398,17 +419,17 @@ const ASK_SYS="Bạn là gia sư Xác suất Thống kê thân thiện. Trả l�
 function askUI(q){const w=el("div",null,"card"),mic=el("button","🎤 Nói","btn g"),inp=el("input"),go=el("button","Hỏi AI","btn"),out=el("div",null,"msg");w.append(el("b","Em chưa hiểu chỗ nào?"));inp.placeholder="Gõ hoặc bấm micro, ví dụ: tại sao lại chia cho n−1?";
  const ask=async t=>{if(!t.trim())return;out.textContent="AI đang suy nghĩ...";try{const a=await SM(ASK_SYS,[{role:"user",text:"Câu ôn tập: "+q.q+"\nĐáp án đúng: "+q.o[q.a]+"\nGiải thích: "+q.e+"\nHọc sinh hỏi: "+t}]);show(out,a);speak(a)}catch(e){out.textContent="Lỗi: "+e.message}};
  go.onclick=()=>ask(inp.value);inp.onkeydown=e=>{if(e.key==="Enter")ask(inp.value)};
- mic.onclick=()=>{if(!SR){out.textContent="Trình duyệt không hỗ trợ nhận dạng giọng nói, hãy gõ câu hỏi.";return}speechSynthesis.cancel();const r=new SR();r.lang="vi-VN";r.interimResults=true;mic.textContent="⏹ Đang nghe";let fin="";
+ mic.onclick=()=>{if(!SR){out.textContent="Trình duyệt không hỗ trợ nhận dạng giọng nói, hãy gõ câu hỏi.";return}stopSpeak();const r=new SR();r.lang="vi-VN";r.interimResults=true;mic.textContent="⏹ Đang nghe";let fin="";
   r.onresult=ev=>{let t="";for(const x of ev.results)t+=x[0].transcript;inp.value=t;fin=t};r.onerror=ev=>{out.textContent=ev.error==="not-allowed"?"Chưa cấp quyền micro.":ev.error==="no-speech"?"Không nghe thấy, hãy nói lại.":"Lỗi micro: "+ev.error};
   r.onend=()=>{mic.textContent="🎤 Nói";if(fin)ask(fin)};r.start();setTimeout(()=>{try{r.stop()}catch(e){}},15000)};
  w.append(mic,inp,go,out);return w}
 function gPlay(c,list){const qs=list||build(c),b=$("#gbody");let k=0,got=0;
- (function next(){speechSynthesis.cancel();b.textContent="";if(k>=qs.length){b.append(el("h3","Hoàn thành! Đúng "+got+"/"+qs.length+" câu, +"+got*5+" ⭐. Tổng hũ sao: "+stars()),el("button","Chọn chương khác","btn g",gHome),el("button","Xem Ôn tập","btn",()=>location.hash="#review"));$("#gstars").textContent=stars();return}
-  const q=qs[k];b.append(el("p","Chương "+(q.c+1)+" · Level "+(k+1)+"/"+qs.length,"tag"),el("h3",q.q));let done=false;const fb=el("div",null,"msg card"),os=[];
+ (function next(){stopSpeak();b.textContent="";if(k>=qs.length){b.append(el("h3","Hoàn thành! Đúng "+got+"/"+qs.length+" câu, +"+got*5+" ⭐. Tổng hũ sao: "+stars()),el("button","Chọn chương khác","btn g",gHome),el("button","Xem Ôn tập","btn",()=>location.hash="#review"));$("#gstars").textContent=stars();return}
+  const q=qs[k];b.append(el("p","Chương "+(q.c+1)+" · Level "+(k+1)+"/"+qs.length,"tag"),el("h3",q.q));b.appendChild(el("button","🔊 Nghe câu hỏi","btn g",()=>speak(q.q)));let done=false;const fb=el("div",null,"msg card"),os=[];
   q.o.forEach((t,i)=>{const o=el("button",t,"opt",()=>{if(done)return;done=true;const ok=i===q.a;os.forEach(x=>x.disabled=true);
    o.style.borderColor=ok?"var(--ok)":"var(--er)";os[q.a].style.borderColor="var(--ok)";
    LOG.add({ts:new Date().toISOString(),c:q.c,q:q.q,o:q.o,a:q.a,e:q.e,ok});if(ok){got++;LS.set("sv_stars",stars()+5);$("#gstars").textContent=stars()}
-   fb.textContent=(ok?"✅ Đúng! +5 ⭐\n":"❌ Chưa đúng. Đáp án: "+q.o[q.a]+"\n")+"💡 "+q.e;b.append(fb,askUI(q),el("button",k+1<qs.length?"Đã hiểu → Câu tiếp theo":"Xem kết quả","btn",()=>{k++;next()}))});os.push(o);b.appendChild(o)})})()}
+   fb.textContent=(ok?"✅ Đúng! +5 ⭐\n":"❌ Chưa đúng. Đáp án: "+q.o[q.a]+"\n")+"💡 "+q.e;b.append(fb,el("button","🔊 Nghe giải thích","btn g",()=>speak(q.e)),askUI(q),el("button",k+1<qs.length?"Đã hiểu → Câu tiếp theo":"Xem kết quả","btn",()=>{k++;next()}))});os.push(o);b.appendChild(o)})})()}
 function rHome(){const b=$("#rbody");b.textContent="";const l=LOG.get();
  if(!l.length){b.append(el("p","Bạn chưa làm câu nào. Hãy chơi một chương để có dữ liệu ôn tập."),el("button","Chơi ngay","btn",()=>location.hash="#game"));return}
  const by=CH.map((n,i)=>{const r=l.filter(x=>x.c===i);return{n,i,t:r.length,ok:r.filter(x=>x.ok).length}}).filter(x=>x.t);
@@ -498,7 +519,7 @@ function fList(){const box=$("#flist");box.textContent="";const m=$("#fmode");
   if(OPEN.has(p.id)){w.style.maxHeight="none";ch.classList.add("up")}
   card.append(w,ch);box.appendChild(card)})}
 
-route();prev();
+route();prev();mr(document.querySelector("main"));
 </script>
 </body>
 </html>
