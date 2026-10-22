@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>STATVERSE – Learn. Play. Solve. Level Up.</title>
+<script src="supabase-config.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--bg:#070a1f;--glass:rgba(14,20,52,.78);--line:rgba(140,160,255,.28);--tx:#f1f4ff;--mut:#a9b3e6;--ac:#7c5cff;--ac2:#22d3ee;--ok:#34d399;--er:#f87171}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.6 Inter,"Plus Jakarta Sans",system-ui,sans-serif;min-height:100vh}
+#bg{position:fixed;inset:0;z-index:-1;width:100%;height:100%}
+nav{position:sticky;top:0;z-index:20;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 16px;background:rgba(7,10,31,.9);border-bottom:1px solid var(--line)}
+nav a,nav button{color:var(--tx);background:none;border:0;padding:8px 10px;border-radius:10px;cursor:pointer;font:inherit;font-size:14px;text-decoration:none}
+nav a:hover,nav button:hover{background:rgba(124,92,255,.25)}
+.logo{font-weight:800;font-size:18px;letter-spacing:.5px}.sp{flex:1}
+.cta{background:linear-gradient(90deg,var(--ac),var(--ac2))!important;font-weight:700}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 80px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;backdrop-filter:blur(8px)}
+@supports not (backdrop-filter:blur(8px)){.card{background:rgba(14,20,52,.95)}}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.15;margin:.2em 0}h2{margin:.2em 0}
+.tag{color:var(--ac2);font-size:12px;letter-spacing:2px;text-transform:uppercase}
+.btn{background:linear-gradient(90deg,var(--ac),var(--ac2));color:#fff;border:0;border-radius:12px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
+.btn.g{background:rgba(255,255,255,.1);border:1px solid var(--line)}.btn:disabled{opacity:.5;cursor:wait}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+textarea,input,select{width:100%;background:rgba(0,0,0,.45);color:var(--tx);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit}
+textarea{min-height:120px;resize:vertical}
+.opt{display:block;text-align:left;width:100%;margin:6px 0;padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--tx);cursor:pointer;font:inherit}
+.opt.on{border-color:var(--ac2);background:rgba(34,211,238,.15)}
+.view{display:none}.view.on{display:block}
+.tb{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.tb button{background:rgba(255,255,255,.1);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:4px 8px;cursor:pointer}
+.msg{white-space:pre-wrap;overflow-x:auto}.msg .katex-display{overflow-x:auto;overflow-y:hidden}
+details{background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:8px 14px}summary{cursor:pointer;font-weight:700}
+.steps{display:flex;gap:6px;margin-bottom:10px}.steps i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.15)}.steps i.on{background:var(--ac2)}
+table.lp{border-collapse:collapse;font-size:12px;width:100%;display:block;overflow-x:auto}.lp td,.lp th{border:1px solid var(--line);padding:3px 6px;text-align:center}.lp th{background:rgba(124,92,255,.3)}
+#modal,#fbmodal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}#modal.on,#fbmodal.on{display:flex}
+#modal .card,#fbmodal .card{width:min(520px,100%);background:#0b1030}
+.st{font-size:14px;min-height:22px;margin-top:8px}.ok{color:var(--ok)}.er{color:var(--er)}
+#cbtn{position:fixed;right:18px;bottom:18px;z-index:30;width:58px;height:58px;border-radius:50%;border:0;font-size:26px;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 0 24px var(--ac)}
+#cbox{position:fixed;right:18px;bottom:88px;z-index:30;width:min(380px,calc(100vw - 36px));height:min(520px,70vh);display:none;flex-direction:column;background:#0b1030;border:1px solid var(--line);border-radius:18px;padding:12px}
+#cbox.on{display:flex}#clog{flex:1;overflow-y:auto}.b{margin:6px 0;padding:8px 12px;border-radius:12px;max-width:92%}.b.u{background:rgba(124,92,255,.35);margin-left:auto}.b.a{background:rgba(255,255,255,.08)}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+img.pv{max-width:100%;max-height:260px;border-radius:12px;margin-top:8px}
+.fwrap{overflow:hidden;max-height:0;transition:max-height .35s ease}.chev{display:block;margin:8px auto 0;background:none;border:0;color:var(--ac2);font-size:22px;text-shadow:0 0 10px var(--ac2);cursor:pointer;transition:transform .3s}.chev.up{transform:rotate(180deg)}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<nav>
+  <a href="#home" class="logo">∑ STATVERSE</a>
+  <a href="#solve">Giải Toán</a><a href="#proc">Quy Trình 4 Bước</a><a href="#laplace">Hàm Laplace</a>
+  <a href="#forum">Diễn đàn</a><a href="#tutor">TUTOR</a><a href="#game">Chơi trò chơi</a><a href="#review">Ôn tập</a>
+  <span class="sp"></span>
+  <button id="keyBtn" title="Cấu hình khóa Gemini">🔑 Khóa AI</button><button id="fbBtn" title="Tài khoản / Supabase">☁️ Tài khoản</button>
+  <a href="#solve" class="cta" style="border-radius:10px">Giải Đề Ngay</a>
+</nav>
+<main>
+<section id="home" class="view">
+  <div class="card"><div class="tag">Nền Tảng Toán Xác Suất Thống Kê Chuẩn Đại Học</div>
+  <h1>Giải Toán &amp; Trực Quan Hóa<br>Phân Phối Chuẩn &amp; Xác Suất</h1>
+  <p>Tự động hỗ trợ giải bài tập, phân tích từng bước và giúp sinh viên hiểu rõ bản chất kiến thức Xác suất Thống kê thông qua trải nghiệm học tập trực quan, chủ động và dễ hiểu.</p>
+  <p class="msg">Công thức mẫu: \(P(A\mid B)=\frac{P(A\cap B)}{P(B)}\), \(Z=\frac{X-\mu}{\sigma}\), \(X\sim N(\mu,\sigma^2)\)</p>
+  <a class="btn" href="#solve" style="text-decoration:none;display:inline-block">Thử Bộ Giải Tự Động ✨</a></div>
+  <div class="grid">
+    <div class="card"><h2>Giải bài – AI BUDDY – SOLVE</h2><p>Nhập đề hoặc chụp ảnh để nhận hướng dẫn giải từng bước.</p><a class="btn" href="#solve" style="text-decoration:none;display:inline-block">Bắt đầu giải bài</a></div>
+    <div class="card"><h2>Chơi trò chơi</h2><p>Củng cố kiến thức qua các level thử thách.</p><a class="btn" href="#game" style="text-decoration:none;display:inline-block">Chơi ngay</a></div>
+    <div class="card"><h2>Ôn tập</h2><p>Nhìn lại kiến thức đã học và lỗi sai cần củng cố.</p><a class="btn" href="#review" style="text-decoration:none;display:inline-block">Xem ôn tập</a></div>
+  </div>
+</section>
+
+<section id="solve" class="view">
+  <div class="card"><div class="steps" id="stepbar"><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="s1"><h2>Bước 1. Nhập đề bài</h2><p>Chào bạn! Hãy gửi bài tập Xác suất Thống kê mà bạn cần hỗ trợ nhé.</p>
+    <div class="tb" id="tb"></div>
+    <textarea id="prob" placeholder="Gõ hoặc dán đề bài. Công thức dùng \( ... \)"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <label class="btn g">📷 Chụp ảnh<input id="cam" type="file" accept="image/*" capture="environment" hidden></label><label class="btn g">📎 Tải ảnh / Word / PDF<input id="img" type="file" accept="image/*,.docx,.pdf" hidden></label><button class="btn g" id="mic">🎤 Nói đề</button>
+      <button class="btn g" id="ocr" disabled>🔍 Nhận dạng đề từ ảnh</button>
+      <button class="btn g" id="clr">Xóa</button></div>
+    <img id="pv" class="pv" hidden alt="Ảnh đề">
+    <p class="tag" style="margin-top:12px">Xem trước (đã render KaTeX)</p><div id="prev" class="msg card"></div>
+    <div class="st" id="s1st"></div><button class="btn" id="n1">Tiếp tục</button></div>
+  <div id="s2" hidden><h2>Bước 2. Bạn đã hiểu đề bài đến đâu?</h2><div id="lv"></div><button class="btn" id="n2">Tiếp tục</button></div>
+  <div id="s3" hidden><h2>Bước 3. Chọn chế độ hỗ trợ</h2><div id="md"></div>
+    <div id="chkbox" hidden><p>Dán lời giải/đáp án của bạn để AI kiểm tra:</p><textarea id="mine"></textarea></div>
+    <button class="btn" id="n3">Giải ngay</button></div>
+  <div id="s4" hidden><h2>Bước 4. Lời giải theo quy trình 4 bước</h2><div class="st" id="s4st"></div><div id="sol"></div>
+    <button class="btn g" id="speak">🔊 Nghe lời giải</button> <button class="btn g" id="stop">⏹ Dừng</button>
+    <button class="btn" id="n4">Tiếp tục</button></div>
+  <div id="s5" hidden><h2>Bước 5. Luyện tập thêm</h2><p>Bạn có muốn luyện tập thêm về dạng bài này không?</p>
+    <a class="btn g" href="#home" style="text-decoration:none;display:inline-block">Không – Quay về trang chủ</a>
+    <a class="btn" href="#game" id="yes" style="text-decoration:none;display:inline-block">Có – Chơi trò chơi</a></div>
+  </div>
+</section>
+
+<section id="proc" class="view"><div class="card"><h2>Quy trình giải toán 4 bước</h2>
+<p><b>Bước 1 – Tìm hiểu nội dung bài toán:</b> xác định dữ kiện, yêu cầu, điều kiện.</p>
+<p><b>Bước 2 – Xây dựng chương trình giải:</b> chọn kiến thức và phương pháp phù hợp.</p>
+<p><b>Bước 3 – Trình bày lời giải:</b> công thức tổng quát trước, rồi thay số, rồi kết quả.</p>
+<p><b>Bước 4 – Kiểm tra và nghiên cứu lời giải:</b> kiểm tra, cách giải khác, bài toán tương tự.</p></div></section>
+
+<section id="laplace" class="view"><div class="card"><h2>Giá trị hàm Laplace \(\Phi_0(z)\)</h2>
+<p>Quy ước: \(\Phi_0(z)=\frac{1}{\sqrt{2\pi}}\int_0^z e^{-t^2/2}\,dt\), và \(\Phi(z)=0{,}5+\Phi_0(z)\). Tính trực tiếp bằng hàm sai số, làm tròn 4 chữ số.</p>
+<div style="display:flex;gap:8px;max-width:360px"><input id="zin" type="number" step="0.01" placeholder="Nhập z"><button class="btn" id="zgo">Tra</button></div>
+<div class="st" id="zout"></div><div id="ltab"></div></div></section>
+
+<section id="tutor" class="view"><div class="card"><h2>TUTOR – Cẩm nang</h2>
+<p>1. Bấm <b>🔑 Khóa AI</b> và dán khóa Gemini miễn phí của riêng bạn (aistudio.google.com/apikey).</p>
+<p>2. Vào <b>Giải Đề Ngay</b>: nhập đề (gõ hoặc ảnh) → xác nhận → chọn mức hiểu → chọn chế độ → xem lời giải 4 bước → luyện tập thêm.</p>
+<p>3. Công thức gõ bằng LaTeX: \(\alpha\), \(\mu\), \(\sigma^2\), \(\chi^2(n)\), \(\Phi(z)\), \(\bar{x}\). Dùng thanh ký hiệu phía trên khung nhập để chèn nhanh.</p>
+<p>4. Nút 💬 góc phải dưới là Chatbot AI hỏi đáp kiến thức; nút 🔊 để nghe tiếng Việt.</p></div></section>
+
+<section id="game" class="view"><div class="card"><h2>Chơi trò chơi – Chinh phục Xác suất Thống kê</h2>
+<p id="gwel" class="ok"></p><p>Học qua từng thử thách. <b>Hũ sao: ⭐ <span id="gstars">0</span></b> · Mỗi câu đúng +5 sao. Mỗi chương 10 câu (nhiều câu đổi số ngẫu nhiên mỗi lần chơi, đáp án được tính bằng công thức).</p>
+<div id="gbody"></div></div></section>
+<section id="review" class="view"><div class="card"><h2>Ôn tập – Theo dõi hành trình học tập</h2>
+<p>Dữ liệu dưới đây là kết quả thật bạn đã chơi trên thiết bị này (lưu trong trình duyệt). Chưa chơi thì sẽ trống.</p><div id="rbody"></div></div></section>
+<section id="forum" class="view"><div class="card"><h2>STATVERSE FORUM</h2>
+<p class="st" id="fmode" style="color:var(--mut)"></p>
+<input id="ftitle" placeholder="Tiêu đề câu hỏi"><div class="tb" id="ftb"></div>
+<textarea id="fbody" placeholder="Nội dung. Dán ảnh bằng Ctrl+V. Công thức dùng \( ... \)"></textarea>
+<label class="btn g" style="display:inline-block;margin-top:6px">🖼 Chọn ảnh<input id="ffile" type="file" accept="image/*" hidden></label>
+<img id="fimg" class="pv" hidden alt="Ảnh đính kèm"><p class="tag" style="margin-top:10px">Xem trước</p><div id="fprev" class="msg card"></div>
+<button class="btn" id="fpost">Đăng bài</button></div><div id="flist"></div></section>
+<section id="soon" class="view"><div class="card"><h2>Tính năng chưa được triển khai</h2><p>Mục này chưa hoạt động trong phiên bản hiện tại và sẽ được bổ sung sau.</p><a class="btn" href="#home" style="text-decoration:none;display:inline-block">Về trang chủ</a></div></section>
+</main>
+<footer>© Nhóm 3 - D01</footer>
+
+<div id="modal"><div class="card">
+  <h2>🔑 Khóa AI (Gemini)</h2>
+  <p style="font-size:14px;color:var(--mut)">Mỗi người dùng khóa miễn phí của riêng mình tại <b>aistudio.google.com/apikey</b>. Khóa chỉ lưu trong trình duyệt của bạn (localStorage), không gửi về máy chủ nào khác ngoài Google.</p>
+  <input id="gkey" type="password" placeholder="Dán khóa AIza..." autocomplete="off">
+  <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap"><button class="btn g" id="gload">Tải danh sách model</button></div>
+  <select id="gmodel"></select>
+  <div class="st" id="gst"></div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn g" id="gtest">Thử kết nối</button><button class="btn" id="gsave">Lưu</button><button class="btn g" id="gdel">Xóa khóa</button><button class="btn g" id="gx">Đóng</button></div>
+</div></div>
+
+<div id="fbmodal"><div class="card"><h2>☁️ Tài khoản &amp; Supabase</h2>
+<p class="st" id="fbinfo" style="color:var(--mut)"></p>
+<details id="fbcfgbox"><summary>Cấu hình Supabase (URL + khóa công khai)</summary>
+<p style="font-size:13px;color:var(--mut)">Lấy ở Supabase → Project Settings → API: <b>Project URL</b> và <b>publishable key</b> (hoặc <b>anon key</b>). <b>Tuyệt đối không dùng secret / service_role key.</b> Cả lớp phải dùng cùng một dự án thì mới thấy chung Diễn đàn.</p>
+<input id="sburl" placeholder="https://xxxx.supabase.co" autocomplete="off"><input id="sbkey" placeholder="sb_publishable_... hoặc anon key (eyJ...)" autocomplete="off" style="margin-top:6px">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn" id="fbcsave">Lưu &amp; kết nối</button><button class="btn g" id="fbcdel">Xóa cấu hình</button></div></details>
+<div id="fbauth" hidden><input id="fbname" placeholder="Tên hiển thị (khi đăng ký)"><input id="fbmail" type="email" placeholder="Email" autocomplete="username" style="margin-top:6px"><input id="fbpass" type="password" placeholder="Mật khẩu (≥ 6 ký tự)" autocomplete="current-password" style="margin-top:6px">
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="fbin">Đăng nhập</button><button class="btn g" id="fbup">Đăng ký</button><button class="btn g" id="fbreset">Quên mật khẩu</button></div></div>
+<div id="fbme" hidden><p id="fbwho"></p><button class="btn g" id="fbout">Đăng xuất</button></div>
+<div class="st" id="fbst"></div><button class="btn g" id="fbx" style="margin-top:8px">Đóng</button></div></div>
+<button id="cbtn" aria-label="Chatbot AI">💬</button>
+<div id="cbox"><b>Chatbot AI STATVERSE</b><div id="clog"></div>
+  <div style="display:flex;gap:6px;margin-top:8px"><input id="cin" placeholder="Hỏi về Xác suất Thống kê..."><button class="btn" id="csend">Gửi</button></div></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const LS={get(k){try{return localStorage.getItem(k)||""}catch(e){return window.__m?.[k]||""}},
+ set(k,v){try{localStorage.setItem(k,v)}catch(e){(window.__m=window.__m||{})[k]=v}},
+ del(k){try{localStorage.removeItem(k)}catch(e){delete (window.__m||{})[k]}}};
+const API="https://generativelanguage.googleapis.com/v1beta/";
+
+/* ===== SM(): gọi Gemini trực tiếp từ trình duyệt bằng khóa của chính người dùng ===== */
+async function SM(system,history,opts={}){
+  const key=opts.key||LS.get("sv_gkey"),model=opts.model||LS.get("sv_gmodel")||"gemini-2.5-flash";
+  if(!key){openKey();throw new Error("Chưa có khóa AI. Hãy bấm “🔑 Khóa AI” và dán khóa Gemini miễn phí của bạn.")}
+  const contents=history.map(m=>({role:m.role==="user"?"user":"model",
+    parts:[{text:m.text},...(m.image?[{inlineData:{mimeType:m.image.mime,data:m.image.b64}}]:[])]}));
+  const body={contents,generationConfig:{temperature:opts.temp??0.3}};
+  if(system)body.systemInstruction={parts:[{text:system}]};
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),opts.timeout||90000);
+  let r;try{
+    r=await fetch(API+"models/"+encodeURIComponent(model)+":generateContent",{method:"POST",signal:ctl.signal,
+      headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)});
+  }catch(e){throw new Error(e.name==="AbortError"?"Hết thời gian chờ AI.":"Lỗi mạng khi gọi Gemini.")}finally{clearTimeout(t)}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const m=j.error?.message||("HTTP "+r.status);
+    throw new Error(r.status===400&&/API key/i.test(m)?"Khóa AI không hợp lệ.":r.status===429?"Đã vượt hạn mức miễn phí, hãy thử lại sau ít phút.":m)}
+  const txt=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("");
+  if(!txt)throw new Error(j.promptFeedback?.blockReason?"Nội dung bị chặn: "+j.promptFeedback.blockReason:"AI không trả về nội dung.");
+  return txt;
+}
+
+/* ===== Hộp thoại Khóa AI ===== */
+function openKey(){$("#gkey").value=LS.get("sv_gkey");fillModels(LS.get("sv_gmodel")?[LS.get("sv_gmodel")]:["gemini-2.5-flash"],LS.get("sv_gmodel"));gst("");$("#modal").classList.add("on")}
+function gst(m,c){const e=$("#gst");e.textContent=m;e.className="st "+(c||"")}
+function fillModels(list,sel){const s=$("#gmodel");s.textContent="";list.forEach(n=>{const o=document.createElement("option");o.value=o.textContent=n;if(n===sel)o.selected=true;s.appendChild(o)})}
+$("#keyBtn").onclick=openKey;$("#gx").onclick=()=>$("#modal").classList.remove("on");
+$("#gload").onclick=async()=>{const k=$("#gkey").value.trim();if(!k)return gst("Hãy dán khóa trước.","er");gst("Đang tải danh sách model...");
+  try{const r=await fetch(API+"models?pageSize=200",{headers:{"x-goog-api-key":k}}),j=await r.json();if(!r.ok)throw new Error(j.error?.message||"HTTP "+r.status);
+    const l=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")&&/gemini/i.test(m.name)).map(m=>m.name.replace("models/","")).sort();
+    if(!l.length)throw new Error("Không có model phù hợp.");const cur=LS.get("sv_gmodel");
+    fillModels(l,l.includes(cur)?cur:(l.find(x=>x==="gemini-2.5-flash")||l[0]));gst("Đã tải "+l.length+" model.","ok")}
+  catch(e){gst("Không tải được: "+e.message,"er")}};
+$("#gtest").onclick=async()=>{const k=$("#gkey").value.trim();if(!k)return gst("Hãy dán khóa trước.","er");gst("Đang thử kết nối...");
+  try{const t=await SM("",[{role:"user",text:"Chỉ trả lời đúng một từ: OK"}],{key:k,model:$("#gmodel").value,timeout:30000});gst("Kết nối thành công: "+t.trim().slice(0,40),"ok")}
+  catch(e){gst("Thất bại: "+e.message,"er")}};
+$("#gsave").onclick=()=>{const k=$("#gkey").value.trim();if(!k)return gst("Chưa có khóa để lưu.","er");LS.set("sv_gkey",k);LS.set("sv_gmodel",$("#gmodel").value);gst("Đã lưu khóa và model.","ok");setTimeout(()=>$("#modal").classList.remove("on"),700)};
+$("#gdel").onclick=()=>{LS.del("sv_gkey");LS.del("sv_gmodel");$("#gkey").value="";gst("Đã xóa khóa khỏi trình duyệt.","ok")};
+
+/* ===== KaTeX (an toàn: chỉ dùng textContent, không innerHTML với dữ liệu AI/người dùng) ===== */
+const DELIM=[{left:"\\[",right:"\\]",display:true},{left:"$$",right:"$$",display:true},{left:"\\(",right:"\\)",display:false}];
+function mr(el){const go=()=>window.renderMathInElement?renderMathInElement(el,{delimiters:DELIM,throwOnError:false,errorColor:"#fbbf24"}):setTimeout(go,200);go()}
+function show(el,text){el.textContent=text;mr(el)}
+
+/* ===== Điều hướng ===== */
+function route(){const h=(location.hash||"#home").slice(1);const id=h.startsWith("soon")?"soon":($("#"+h)?h:"home");if(id==="forum")fList();if(id==="game")gHome();if(id==="review")rHome();
+  $$(".view").forEach(v=>v.classList.toggle("on",v.id===id));window.scrollTo(0,0);
+  if(id==="solve"&&!window.__vis){}}
+addEventListener("hashchange",route);
+
+/* ===== Thanh ký hiệu ===== */
+const SYM=[["frac",String.raw`\frac{a}{b}`],["√",String.raw`\sqrt{x}`],["x²","x^2"],["xᵢ","x_i"],["Σ",String.raw`\sum_{i=1}^{n}`],["∫",String.raw`\int_a^b`],["≤",String.raw`\le `],["≥",String.raw`\ge `],["±",String.raw`\pm `],
+["P(A∣B)",String.raw`P(A\mid B)`],["∩",String.raw`\cap `],["∪",String.raw`\cup `],["Ā",String.raw`\overline{A}`],["E(X)","E(X)"],["Var",String.raw`\operatorname{Var}(X)`],["σ",String.raw`\sigma `],["μ",String.raw`\mu `],["λ",String.raw`\lambda `],
+["α",String.raw`\alpha `],["β",String.raw`\beta `],["χ²",String.raw`\chi^2(n)`],["x̄",String.raw`\bar{x}`],["p̂",String.raw`\hat{p}`],["H₀","H_0"],["H₁","H_1"],["Φ(z)",String.raw`\Phi(z)`],["Φ₀(z)",String.raw`\Phi_0(z)`],["N(μ,σ²)",String.raw`N(\mu,\sigma^2)`]];
+SYM.forEach(([l,t])=>{const b=document.createElement("button");b.type="button";b.textContent=l;b.onclick=()=>{const a=$("#prob"),s=a.selectionStart,e=a.selectionEnd,ins="\\("+t+"\\)";a.setRangeText(ins,s,e,"end");a.focus();prev()};$("#tb").appendChild(b)});
+function prev(){show($("#prev"),$("#prob").value||"(Chưa có nội dung)")}
+$("#prob").oninput=prev;$("#clr").onclick=()=>{$("#prob").value="";img=null;$("#pv").hidden=true;$("#ocr").disabled=true;prev()};
+
+/* ===== Ảnh đề + nhận dạng bằng Gemini vision ===== */
+let img=null;
+function setImg(mime,url){img={mime,b64:url.split(",")[1]};$("#pv").src=url;$("#pv").hidden=false;$("#ocr").disabled=false}
+$("#cam").onchange=e=>{$("#img").onchange({target:e.target})};
+$("#img").onchange=async e=>{const f=e.target.files[0];if(!f)return;const st=$("#s1st");
+ try{if(f.size>10e6)throw new Error("Tệp quá 10MB.");
+  if(/\.docx$/i.test(f.name)){if(!window.mammoth)throw new Error("Chưa tải được thư viện Word.");const r=await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()});
+   $("#prob").value=r.value.trim();prev();st.textContent="Đã trích văn bản Word. Công thức Word (OMML) chưa được chuyển tự động, hãy kiểm tra và gõ lại bằng thanh ký hiệu."}
+  else if(/\.pdf$/i.test(f.name)||f.type==="application/pdf"){if(!window.pdfjsLib)throw new Error("Chưa tải được thư viện PDF.");
+   pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+   const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let t="";
+   for(let i=1;i<=Math.min(d.numPages,5);i++){t+=(await(await d.getPage(i)).getTextContent()).items.map(x=>x.str).join(" ")+"\n"}
+   if(t.trim().length>30){$("#prob").value=t.trim();prev();st.textContent="Đã trích văn bản PDF ("+Math.min(d.numPages,5)+" trang đầu). Hãy kiểm tra ký hiệu toán trước khi tiếp tục."}
+   else{const pg=await d.getPage(1),vp=pg.getViewport({scale:2}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
+    setImg("image/jpeg",cv.toDataURL("image/jpeg",.85));st.textContent="PDF dạng quét: đã chuyển trang 1 thành ảnh. Bấm “Nhận dạng đề từ ảnh”."}}
+  else if(/^image\//.test(f.type)){const rd=new FileReader();rd.onload=()=>{setImg(f.type,rd.result);st.textContent="Đã nhận ảnh. Bấm “Nhận dạng đề từ ảnh”."};rd.readAsDataURL(f)}
+  else throw new Error("Chỉ nhận ảnh, .docx hoặc PDF.")}
+ catch(er){st.textContent="Lỗi: "+er.message}};
+/* Micro nhập đề */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+const SAY=[[/xích[- ]?ma bình phương/gi,"\\(\\sigma^2\\)"],[/xích[- ]?ma/gi,"\\(\\sigma\\)"],[/\bmu\b|\bmiu\b/gi,"\\(\\mu\\)"],[/lam[- ]?đa/gi,"\\(\\lambda\\)"],[/khi bình phương/gi,"\\(\\chi^2\\)"],[/xác suất của ([A-Z]) với điều kiện ([A-Z])/g,"\\(P($1\\mid $2)\\)"],[/xác suất của ([A-Z])/g,"\\(P($1)\\)"],[/(\w) gạch ngang/g,"\\(\\bar{$1}\\)"]];
+$("#mic").onclick=()=>{const st=$("#s1st");if(!SR){st.textContent="Trình duyệt không hỗ trợ nhận dạng giọng nói (hãy dùng Chrome/Edge qua HTTPS).";return}
+ if(rec){rec.stop();return}rec=new SR();rec.lang="vi-VN";rec.interimResults=true;rec.continuous=false;const base=$("#prob").value;$("#mic").textContent="⏹ Đang nghe...";
+ rec.onresult=ev=>{let t="";for(const r of ev.results)t+=r[0].transcript;SAY.forEach(([a,b])=>t=t.replace(a,b));$("#prob").value=(base?base+" ":"")+t;prev()};
+ rec.onerror=ev=>{st.textContent=ev.error==="not-allowed"?"Chưa cấp quyền micro.":ev.error==="no-speech"?"Không nghe thấy gì, hãy nói lại.":"Lỗi micro: "+ev.error};
+ rec.onend=()=>{rec=null;$("#mic").textContent="🎤 Nói đề";st.textContent=st.textContent||"Hãy kiểm tra lại đề vừa nói (có thể nhận nhầm thuật ngữ) rồi bấm Tiếp tục."};rec.start()};
+addEventListener("paste",e=>{if(!$("#solve").classList.contains("on"))return;const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image/"));if(it){const dt=new DataTransfer();dt.items.add(it.getAsFile());$("#img").files=dt.files;$("#img").onchange({target:$("#img")})}});
+const OCR_SYS="Bạn là bộ nhận dạng đề Xác suất Thống kê. Chép lại CHÍNH XÁC nội dung đề trong ảnh bằng tiếng Việt. Mọi công thức viết bằng LaTeX trong \\( ... \\) (ví dụ \\(\\sigma\\), \\(\\Phi_0(z)\\)); tuyệt đối không viết chữ 'alpha', 'sigma'. Bảng số liệu chép thành bảng văn bản. Phần mờ/không chắc chắn: ghi [?...]. Không tự đoán dữ kiện bị mất, không giải bài. Nếu ảnh không phải bài Xác suất Thống kê, trả lời đúng: KHÔNG_PHẢI_ĐỀ.";
+$("#ocr").onclick=async()=>{const b=$("#ocr");b.disabled=true;$("#s1st").textContent="Đang nhận dạng đề...";
+  try{const t=await SM(OCR_SYS,[{role:"user",text:"Hãy chép lại đề trong ảnh.",image:img}],{temp:0});
+    if(/KHÔNG_PHẢI_ĐỀ/.test(t))$("#s1st").textContent="Ảnh này không phải bài Xác suất Thống kê.";
+    else{$("#prob").value=t.trim();prev();$("#s1st").textContent="Đã đọc đề. Hãy đối chiếu với ảnh gốc, sửa nếu cần (chú ý các chỗ [?...]) rồi bấm Tiếp tục."}}
+  catch(e){$("#s1st").textContent="Lỗi: "+e.message}finally{b.disabled=false}};
+
+/* ===== Luồng 5 bước ===== */
+const LV=["Tôi chưa hiểu đề bài","Tôi hiểu đề nhưng chưa biết cách làm","Tôi đã làm thử nhưng chưa chắc chắn","Tôi muốn xem lời giải đầy đủ"];
+const MD=[["GỢI Ý","Gợi ý từng phần, không lộ toàn bộ lời giải"],["HƯỚNG DẪN","Phân tích đề, hướng dẫn từng bước và lý do chọn công thức"],["KIỂM TRA","Bạn nhập lời giải, AI chỉ lỗi sai và cách sửa"],["GIẢI ĐẦY ĐỦ","Lời giải chi tiết từ đầu đến cuối"]];
+let lv=3,md=3,solText="";
+function opts(box,arr,get,set){box.textContent="";arr.forEach((a,i)=>{const b=document.createElement("button");b.className="opt"+(get()===i?" on":"");b.textContent=Array.isArray(a)?a[0]+" — "+a[1]:a;b.onclick=()=>{set(i);opts(box,arr,get,set);if(box.id==="md")$("#chkbox").hidden=md!==2};box.appendChild(b)})}
+function go(n){["s1","s2","s3","s4","s5"].forEach((s,i)=>$("#"+s).hidden=i!==n-1);$$("#stepbar i").forEach((x,i)=>x.classList.toggle("on",i<n))}
+$("#n1").onclick=()=>{if(!$("#prob").value.trim()&&!img){$("#s1st").textContent="Hãy nhập hoặc chụp đề bài trước.";return}
+  if(/\[\?/.test($("#prob").value)&&!confirm("Đề còn chỗ chưa chắc chắn [?...]. Bạn đã kiểm tra chưa?"))return;go(2)};
+$("#n2").onclick=()=>go(3);$("#n3").onclick=solve;$("#n4").onclick=()=>go(5);
+opts($("#lv"),LV,()=>lv,i=>lv=i);opts($("#md"),MD,()=>md,i=>md=i);
+const SOLVE_SYS=`Bạn là gia sư Xác suất Thống kê đại học, người Việt, kiên nhẫn, chính xác. Chỉ hỗ trợ môn Xác suất Thống kê; ngoài phạm vi thì từ chối lịch sự. Trả lời tiếng Việt.
+QUY TẮC KÝ HIỆU: mọi công thức viết bằng LaTeX trong \\( ... \\) (nội dòng) hoặc \\[ ... \\] (riêng dòng). Không viết chữ đọc tên ký hiệu (alpha, sigma...) thay cho ký hiệu. Không dùng markdown (không **, không #, không bảng markdown).
+Nếu đề thiếu dữ kiện hoặc mơ hồ: nêu rõ điều đó và hỏi lại hoặc nêu giả định. Phân biệt Φ(z) và Φ₀(z) theo đúng quy ước bảng tra. Không làm tròn trung gian quá sớm.
+BẮT BUỘC trình bày đúng 4 phần, mỗi phần mở đầu bằng một dòng tiêu đề chính xác như sau:
+@@BUOC1 Tìm hiểu nội dung bài toán (dữ kiện, điều kiện, yêu cầu, ký hiệu hóa đề)
+@@BUOC2 Xây dựng chương trình giải (kiến thức, công thức áp dụng, điều kiện, kế hoạch)
+@@BUOC3 Trình bày lời giải (công thức tổng quát trước khi thay số, từng phép tính, KẾT QUẢ rõ ràng)
+@@BUOC4 Kiểm tra và nghiên cứu lời giải (kiểm tra lại, lỗi thường gặp, cách giải khác, bài tương tự)
+`;
+const MODE_HINT=["Chế độ GỢI Ý: chỉ gợi ý từng phần, nêu kiến thức và công thức liên quan, KHÔNG đưa đáp án hay lời giải hoàn chỉnh; phần @@BUOC3 chỉ nêu hướng làm.","Chế độ HƯỚNG DẪN: phân tích đề, hướng dẫn từng bước và giải thích lý do chọn công thức; có thể dừng trước phép tính cuối để bạn tự làm.","Chế độ KIỂM TRA: chấm lời giải của người học theo từng bước, chỉ bước đúng/sai, gắn nhãn lỗi (Khái niệm, Công thức, Tính toán, Đọc đề, Thiếu bước, Trình bày), nêu vì sao sai và cách sửa. Đặt phần chấm vào @@BUOC3.","Chế độ GIẢI ĐẦY ĐỦ: lời giải chi tiết từ đầu đến cuối, nêu đáp án cuối."];
+async function solve(){go(4);const box=$("#sol");box.textContent="";$("#s4st").textContent="AI đang giải...";$("#n3").disabled=true;
+  const mine=md===2?$("#mine").value.trim():"";
+  const text="ĐỀ BÀI:\n"+$("#prob").value+"\n\nMỨC HIỂU CỦA NGƯỜI HỌC: "+LV[lv]+"\n"+MODE_HINT[md]+(mine?"\n\nBÀI LÀM CỦA NGƯỜI HỌC:\n"+mine:"");
+  try{solText=await SM(SOLVE_SYS,[{role:"user",text,image:img&&!$("#prob").value.trim()?img:null}]);$("#s4st").textContent="";render4(solText)}
+  catch(e){$("#s4st").textContent="Lỗi: "+e.message}finally{$("#n3").disabled=false}}
+function render4(t){const box=$("#sol");box.textContent="";const parts=t.split(/@@BUOC(\d)\s*/).slice(1);
+  if(parts.length<2){const d=document.createElement("div");d.className="msg card";show(d,t);box.appendChild(d);return}
+  for(let i=0;i<parts.length;i+=2){const body=parts[i+1].trim(),nl=body.indexOf("\n");
+    const d=document.createElement("details");d.open=true;const s=document.createElement("summary");s.textContent="Bước "+parts[i]+" — "+(nl<0?body:body.slice(0,nl));
+    const c=document.createElement("div");c.className="msg";c.textContent=nl<0?"":body.slice(nl+1).trim();d.append(s,c);box.appendChild(d);mr(c)}}
+
+/* ===== Đọc tiếng Việt (TTS) với bộ chuẩn hóa ký hiệu ===== */
+function normSpeech(t){return t.replace(/@@BUOC(\d)/g,"Bước $1").replace(/\\\[|\\\]|\\\(|\\\)|\$\$/g," ")
+ .replace(/\\operatorname\{Var\}/g,"phương sai").replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g,"$1 trên $2").replace(/\\sqrt\{([^{}]*)\}/g,"căn bậc hai của $1")
+ .replace(/\\bar\{(\w)\}/g,"$1 gạch ngang").replace(/\\hat\{(\w)\}/g,"$1 mũ").replace(/\\overline\{(\w)\}/g,"phần bù của $1")
+ .replace(/\\Phi_0/g,"phi không").replace(/\\Phi/g,"phi").replace(/\\varphi/g,"phi nhỏ").replace(/\\chi\^2/g,"khi bình phương").replace(/\\sigma\^2/g,"xích-ma bình phương")
+ .replace(/\\sigma/g,"xích-ma").replace(/\\mu/g,"mu").replace(/\\lambda/g,"lam-đa").replace(/\\alpha/g,"an-pha").replace(/\\beta/g,"bê-ta")
+ .replace(/\\mid/g," với điều kiện ").replace(/\\cap/g," giao ").replace(/\\cup/g," hợp ").replace(/\\sum/g,"tổng").replace(/\\int/g,"tích phân")
+ .replace(/\\le\b|\\leq/g," nhỏ hơn hoặc bằng ").replace(/\\ge\b|\\geq/g," lớn hơn hoặc bằng ").replace(/\\pm/g," cộng trừ ").replace(/\\approx/g," xấp xỉ ")
+ .replace(/H_0/g,"H không").replace(/H_1/g,"H một").replace(/\^2/g," bình phương").replace(/_\{?([\w]+)\}?/g," $1 ").replace(/[{}\\^]/g," ")
+ .replace(/[*#`]/g,"").replace(/(\d)\.(\d)/g,"$1 phẩy $2").replace(/\s+/g," ").trim()}
+function speak(t){if(!("speechSynthesis" in window))return alert("Trình duyệt không hỗ trợ đọc.");speechSynthesis.cancel();
+  const vs=speechSynthesis.getVoices(),v=vs.find(x=>/^vi/i.test(x.lang));
+  normSpeech(t).split(/(?<=[.!?;])\s+/).filter(Boolean).forEach(s=>{const u=new SpeechSynthesisUtterance(s);u.lang="vi-VN";if(v)u.voice=v;speechSynthesis.speak(u)});
+  if(!v)console.warn("Thiết bị chưa có giọng đọc tiếng Việt")}
+$("#speak").onclick=()=>solText&&speak(solText);$("#stop").onclick=()=>speechSynthesis.cancel();
+addEventListener("hashchange",()=>speechSynthesis.cancel());
+
+/* ===== Laplace ===== */
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x))}
+const L0=z=>0.5*erf(z/Math.SQRT2);
+(function(){const t=document.createElement("table");t.className="lp";const h=t.insertRow();h.insertCell().outerHTML="<th>z</th>";for(let j=0;j<10;j++)h.insertCell().outerHTML="<th>0,0"+j+"</th>";
+ for(let i=0;i<=39;i++){const r=t.insertRow(),c=r.insertCell();c.textContent=(i/10).toFixed(1).replace(".",",");c.style.fontWeight=700;for(let j=0;j<10;j++)r.insertCell().textContent=L0(i/10+j/100).toFixed(4).replace(".",",")}$("#ltab").appendChild(t)})();
+$("#zgo").onclick=()=>{const z=parseFloat($("#zin").value);if(isNaN(z))return;show($("#zout"),"\\(\\Phi_0("+z+")\\approx "+L0(z).toFixed(4)+"\\),  \\(\\Phi("+z+")\\approx "+(0.5+L0(z)).toFixed(4)+"\\)")};
+
+/* ===== Chatbot AI (nút nổi) ===== */
+const CHAT_SYS=`Bạn là một bạn nữ người Việt học giỏi Xác suất Thống kê, xưng "mình – bạn", thân thiện, kiên nhẫn, câu ngắn gọn, tự nhiên. Chỉ hỗ trợ Xác suất Thống kê và toán nền tảng liên quan; chủ đề khác thì từ chối nhẹ nhàng và mời quay lại Toán. Giải thích bằng ví dụ gần gũi trước, công thức sau. Công thức LaTeX trong \\( ... \\) hoặc \\[ ... \\], không dùng markdown, không viết chữ đọc tên ký hiệu. Nếu không chắc, nói rõ. Hỏi lại tối đa một câu khi thiếu thông tin. Nếu được hỏi bạn có phải người thật không, hãy nói thật bạn là AI.`;
+const hist=[];
+$("#cbtn").onclick=()=>$("#cbox").classList.toggle("on");
+function bub(c,t){const d=document.createElement("div");d.className="b msg "+c;if(c==="a"){show(d,t);const s=document.createElement("button");s.textContent="🔊";s.style.cssText="background:none;border:0;cursor:pointer";s.onclick=()=>speak(t);d.appendChild(s)}else d.textContent=t;$("#clog").appendChild(d);$("#clog").scrollTop=1e9;return d}
+async function csend(){const i=$("#cin"),t=i.value.trim();if(!t)return;i.value="";speechSynthesis.cancel();bub("u",t);hist.push({role:"user",text:t});
+  const w=bub("a","Đang trả lời...");$("#csend").disabled=true;
+  try{const a=await SM(CHAT_SYS,hist.slice(-12));hist.push({role:"model",text:a});w.remove();bub("a",a)}
+  catch(e){w.textContent="⚠️ "+e.message;hist.pop()}finally{$("#csend").disabled=false}}
+$("#csend").onclick=csend;$("#cin").onkeydown=e=>{if(e.key==="Enter")csend()};
+
+/* ===== Nền vũ trụ (canvas, tôn trọng reduced-motion, dừng khi tab ẩn, ít sao hơn trên điện thoại) ===== */
+(function(){const c=$("#bg"),x=c.getContext("2d"),rm=matchMedia("(prefers-reduced-motion:reduce)").matches;let W,H,S=[],run=true,raf;
+ function sz(){const d=Math.min(devicePixelRatio||1,2);W=c.width=innerWidth*d;H=c.height=innerHeight*d;const n=Math.round((innerWidth<700?0.4:1)*900);
+  S=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4*d+.2,p:Math.random()*6.28,s:.5+Math.random()*2,h:[210,260,45,190][Math.floor(Math.random()*4)]}));draw(0)}
+ function draw(t){x.fillStyle="#070a1f";x.fillRect(0,0,W,H);
+  const g=x.createRadialGradient(W*.75,H*.2,0,W*.75,H*.2,W*.5);g.addColorStop(0,"rgba(124,92,255,.28)");g.addColorStop(1,"transparent");x.fillStyle=g;x.fillRect(0,0,W,H);
+  const g2=x.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,W*.45);g2.addColorStop(0,"rgba(34,211,238,.18)");g2.addColorStop(1,"transparent");x.fillStyle=g2;x.fillRect(0,0,W,H);
+  for(const s of S){x.globalAlpha=rm?.8:.4+.6*Math.abs(Math.sin(t/1000*s.s+s.p));x.fillStyle="hsl("+s.h+",80%,85%)";x.beginPath();x.arc(s.x,s.y,s.r,0,6.28);x.fill()}x.globalAlpha=1}
+ function loop(t){if(!run)return;draw(t);raf=requestAnimationFrame(loop)}
+ addEventListener("resize",sz);document.addEventListener("visibilitychange",()=>{run=!document.hidden;cancelAnimationFrame(raf);if(run&&!rm)raf=requestAnimationFrame(loop)});
+ sz();if(!rm)raf=requestAnimationFrame(loop)})();
+
+/* ===== Chơi trò chơi & Ôn tập ===== */
+const CH=["Xác suất và công thức tính xác suất","Biến ngẫu nhiên","Một số phân phối xác suất thông dụng","Mẫu ngẫu nhiên và số đặc trưng mẫu","Ước lượng khoảng","Kiểm định giả thiết","So sánh 2 tham số"];
+/*GEN-START*/
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),P=a=>a[R(0,a.length-1)],F=x=>String(+(+x).toFixed(3)).replace(".",",");
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const D3=[[.2,.5,.3],[.1,.6,.3],[.3,.3,.4],[.25,.5,.25]],YN=a=>[a?"Bác bỏ H0":"Không bác bỏ H0",a?"Không bác bỏ H0":"Bác bỏ H0","Chấp nhận H1 với độ chắc chắn 100%","Phải tăng mức ý nghĩa α"];
+const TP=[[
+()=>{const p=P([.2,.3,.4,.5]),q=P([.1,.3,.6]);return["A, B độc lập, P(A)="+F(p)+", P(B)="+F(q)+". Tính P(A∪B).",p+q-p*q,[p+q,p*q,Math.abs(p-q),p*q+p],"P(A∪B)=P(A)+P(B)−P(A)P(B)="+F(p+q-p*q)+"."]},
+()=>{const a=P([.1,.2,.3]),b=a+P([.1,.2,.3,.4]);return["P(AB)="+F(a)+", P(A)="+F(b)+". Tính P(B|A).",a/b,[a*b,b-a,b/a,1-a/b],"P(B|A)=P(AB)/P(A)="+F(a)+"/"+F(b)+"≈"+F(a/b)+"."]},
+()=>{const x=P([.2,.3,.5]),y=P([.1,.4,.6]),t=.6*x+.4*y;return["P(A1)=0,6; P(A2)=0,4; P(B|A1)="+F(x)+"; P(B|A2)="+F(y)+". Tính P(B).",t,[x+y,.6*x,(x+y)/2,.4*x+.6*y],"Xác suất đầy đủ: P(B)=0,6·"+F(x)+"+0,4·"+F(y)+"="+F(t)+"."]},
+()=>{const n=R(5,9),k=P([2,3]),c=k===2?n*(n-1)/2:n*(n-1)*(n-2)/6,pm=k===2?n*(n-1):n*(n-1)*(n-2);return["Chọn "+k+" người từ "+n+" người (không phân biệt thứ tự). Có bao nhiêu cách?",c,[pm,Math.pow(n,k),n*k,c+n],"Tổ hợp C("+n+","+k+")="+c+", không nhầm với chỉnh hợp "+pm+"."]}],[
+()=>{const d=P(D3),e=d[1]+2*d[2];return["X nhận giá trị 0, 1, 2 với xác suất "+d.map(F).join("; ")+". Tính E(X).",e,[d[1]+d[2],e*e,1,2*d[2]],"E(X)=0·"+F(d[0])+"+1·"+F(d[1])+"+2·"+F(d[2])+"="+F(e)+"."]},
+()=>{const d=P(D3),e=d[1]+2*d[2],e2=d[1]+4*d[2],v=e2-e*e;return["X nhận giá trị 0, 1, 2 với xác suất "+d.map(F).join("; ")+". Tính Var(X).",v,[e2,e*e,Math.sqrt(v),e2+e],"E(X²)="+F(e2)+"; Var(X)=E(X²)−[E(X)]²="+F(e2)+"−"+F(e*e)+"="+F(v)+"."]},
+()=>{const a=R(0,5),b=a+P([4,6,8,10]);return["X có phân phối đều trên ["+a+"; "+b+"]. Tính E(X).",(a+b)/2,[(b-a)/2,(b-a)*(b-a)/12,b/2,a+b],"E(X)=(a+b)/2="+F((a+b)/2)+"."]},
+()=>{const m=R(2,6),v=R(1,4),a=P([2,3]),b=R(1,5);return["E(X)="+m+", Var(X)="+v+". Tính Var("+a+"X+"+b+").",a*a*v,[a*v,a*v+b,a*a*v+b,v+b],"Var(aX+b)=a²Var(X)="+a*a+"·"+v+"="+a*a*v+" (hằng số b không đổi phương sai)."]}],[
+()=>{const n=P([10,20,50]),p=P([.1,.2,.3,.4]);return["X ~ B("+n+"; "+F(p)+"). Tính E(X).",n*p,[n*p*(1-p),p,n+p,n/p],"E(X)=np="+n+"·"+F(p)+"="+F(n*p)+"."]},
+()=>{const n=P([10,20,25]),p=P([.2,.4,.6]),v=n*p*(1-p);return["X ~ B("+n+"; "+F(p)+"). Tính Var(X).",v,[n*p,Math.sqrt(v),n*p*p,p*(1-p)],"Var(X)=npq="+n+"·"+F(p)+"·"+F(1-p)+"="+F(v)+"."]},
+()=>{const l=R(2,4);return["X ~ P("+l+") (Poisson). Tính E(X²).",l+l*l,[l*l,l,2*l,l*l+2*l],"E(X²)=Var(X)+[E(X)]²=λ+λ²="+l+"+"+l*l+"="+(l+l*l)+"."]},
+()=>{const m=R(10,20),s=P([2,3,5]);return["X ~ N("+m+"; "+s*s+") (σ="+s+"). Theo quy tắc 68–95–99,7, đầu mút dưới của khoảng chứa ≈95% giá trị là?",m-2*s,[m-s,m-3*s,m+2*s,m-s*s-1],"Khoảng 95% là μ±2σ, đầu dưới = "+m+"−2·"+s+"="+(m-2*s)+"."]}],[
+()=>{const x=Array.from({length:5},()=>R(1,9)),t=x.reduce((a,b)=>a+b),m=t/5;return["Mẫu: "+x.join(", ")+". Tính trung bình mẫu.",m,[t/4,Math.max(...x),t/6,m+1],"x̄=("+x.join("+")+")/5="+F(m)+"."]},
+()=>{const m=R(3,9),d=P([1,2,3]);return["Mẫu: "+(m-d)+", "+m+", "+(m+d)+". Tính phương sai mẫu hiệu chỉnh s².",d*d,[2*d*d/3,d,2*d*d,d*d+1],"x̄="+m+"; Σ(xi−x̄)²="+2*d*d+"; chia (n−1)=2 ⇒ s²="+d*d+" (chia n sẽ sai)."]},
+()=>{const x=sh(Array.from({length:15},(_,i)=>i+1)).slice(0,5),so=[...x].sort((a,b)=>a-b),md=so[2];return["Mẫu: "+x.join(", ")+". Tìm trung vị.",md,[x[2]===md?so[1]:x[2],x.reduce((a,b)=>a+b)/5,so[4],so[0]],"Sắp xếp: "+so.join(", ")+" ⇒ trung vị là giá trị giữa = "+md+"."]},
+()=>{const s=P([6,10,12]),n=P([4,9,16,25]);return["Biết σ="+s+", cỡ mẫu n="+n+". Độ lệch chuẩn của trung bình mẫu x̄ là?",s/Math.sqrt(n),[s/n,s*Math.sqrt(n),s,s/(n*n)],"σ(x̄)=σ/√n="+s+"/"+Math.sqrt(n)+"="+F(s/Math.sqrt(n))+"."]}],[
+()=>{const s=P([5,10,20]),n=P([25,100,400]),e=1.96*s/Math.sqrt(n);return["Độ tin cậy 95%, σ="+s+", n="+n+". Tính sai số ε (z=1,96).",e,[s/Math.sqrt(n),1.96*s/n,2.576*s/Math.sqrt(n),1.645*s/Math.sqrt(n)],"ε=z·σ/√n=1,96·"+s+"/"+Math.sqrt(n)+"="+F(e)+"."]},
+()=>{const xb=R(40,60),s=P([5,10,20]),n=P([25,100,400]),e=1.96*s/Math.sqrt(n);return["x̄="+xb+", σ="+s+", n="+n+". Cận dưới khoảng tin cậy 95% cho μ là?",xb-e,[xb+e,xb-s/Math.sqrt(n),xb-2.576*s/Math.sqrt(n),xb-1.645*s/Math.sqrt(n)],"Cận dưới = x̄−ε = "+xb+"−"+F(e)+" = "+F(xb-e)+"."]},
+()=>{const s=P([5,10]),e=P([1,2]),r=Math.pow(1.96*s/e,2),n=Math.ceil(r);return["Cần ước lượng μ với σ="+s+", sai số tối đa "+e+", độ tin cậy 95%. Cỡ mẫu tối thiểu?",n,[Math.floor(r),Math.round(1.96*s/e),Math.ceil(Math.pow(1.645*s/e,2)),Math.ceil(Math.pow(2.576*s/e,2))],"n≥(zσ/ε)²="+F(r)+" ⇒ làm tròn LÊN thành "+n+"."]},
+()=>{const [c,z]=P([[90,1.645],[95,1.96],[99,2.576]]);return["Độ tin cậy "+c+"%. Giá trị z(α/2) bằng?",z,[1.645,1.96,2.576,2.326],"Tra bảng chuẩn tắc: độ tin cậy "+c+"% ⇒ z(α/2)="+F(z)+"."]}],[
+()=>{const m0=R(40,60),s=P([4,6,10]),n=P([16,25,100]),d=P([1,2,3]),z=d*Math.sqrt(n)/s;return["H0: μ="+m0+", σ="+s+", n="+n+", x̄="+(m0+d)+". Tính thống kê z.",z,[d/s,d*n/s,d*s/Math.sqrt(n),d*Math.sqrt(n)],"z=(x̄−μ0)/(σ/√n)="+d+"/("+s+"/"+Math.sqrt(n)+")="+F(z)+"."]},
+()=>{const z=P([1.2,1.8,2.3,2.8,-2.2,-1.5]),r=Math.abs(z)>1.96;return["Kiểm định hai phía, α=0,05 (z tới hạn 1,96), z="+F(z)+". Kết luận?",r?"Bác bỏ H0":"Không bác bỏ H0",YN(r).slice(1),"|z|="+F(Math.abs(z))+(r?" > ":" < ")+"1,96 ⇒ "+(r?"rơi vào miền bác bỏ.":"chưa rơi vào miền bác bỏ.")]},
+()=>{const a=P([.01,.05,.1]);return["Mức ý nghĩa α="+F(a)+". Xác suất mắc sai lầm loại I bằng?",a,[1-a,a/2,2*a,.5],"Sai lầm loại I: bác bỏ H0 khi H0 đúng, xác suất bằng α."]},
+()=>{const p=P([.01,.03,.08,.2]),r=p<.05;return["p-value="+F(p)+", α=0,05. Kết luận?",r?"Bác bỏ H0":"Không bác bỏ H0",YN(r).slice(1),"p "+(r?"<":">")+" α ⇒ "+(r?"bác bỏ H0.":"chưa đủ bằng chứng bác bỏ H0.")]}],[
+()=>{const v1=P([4,9,16]),n1=P([16,36,64]),v2=P([9,25]),n2=P([25,100]),v=v1/n1+v2/n2;return["σ1²="+v1+", n1="+n1+"; σ2²="+v2+", n2="+n2+". Tính Var(x̄1−x̄2).",v,[v1/n1*v2/n2,(v1+v2)/(n1+n2),v1/n1-v2/n2,Math.sqrt(v)],"Var(x̄1−x̄2)=σ1²/n1+σ2²/n2="+F(v1/n1)+"+"+F(v2/n2)+"="+F(v)+" (cộng, không trừ)."]},
+()=>{const a=R(20,30),b=R(10,19);return["x̄1="+a+", x̄2="+b+". Ước lượng điểm của μ1−μ2 là?",a-b,[a+b,b-a,(a+b)/2,a*b],"Ước lượng điểm: x̄1−x̄2="+(a-b)+"."]},
+()=>{const a=R(30,60),b=R(10,29);return["Hai mẫu cỡ 100: "+a+" và "+b+" phần tử có tính chất A. Tính p̂1−p̂2.",(a-b)/100,[(a+b)/100,(b-a)/100,a-b,(a-b)/200],"p̂1−p̂2="+a+"/100−"+b+"/100="+F((a-b)/100)+"."]},
+()=>["So sánh hai phương sai σ1² và σ2² (hai mẫu độc lập, tổng thể chuẩn) dùng phân phối nào?","Fisher",["Student","Chuẩn tắc","Khi bình phương"],"Tỉ số s1²/s2² (chia cho σ1²/σ2²) có phân phối Fisher F(n1−1; n2−1)."]]];
+const STAT=[[0,"A, B độc lập, P(A)=0,3 và P(B)=0,4. Tính P(A∪B).",["0,12","0,58","0,70","0,7"],1,"P(A∪B)=0,3+0,4−0,12=0,58. Nhầm thường gặp: quên trừ P(AB)."],
+[0,"P(AB)=0,2 và P(A)=0,5. Tính P(B|A).",["0,10","0,25","0,40","0,70"],2,"P(B|A)=P(AB)/P(A)=0,2/0,5=0,4."],
+[1,"P(X=0)=0,2; P(X=1)=0,5; P(X=2)=0,3. Tính E(X).",["1,0","1,1","1,3","0,8"],1,"E(X)=0,5+0,6=1,1."],
+[1,"Cùng bảng phân phối trên, Var(X) bằng?",["0,49","1,7","1,21","0,70"],0,"E(X²)=1,7; Var=1,7−1,21=0,49."],
+[2,"X ~ B(10; 0,3). Tính E(X).",["0,3","2,1","3","7"],2,"E(X)=np=3 (Var=npq=2,1)."],
+[2,"X ~ N(10; 4). Tính P(X ≤ 10).",["0,25","0,5","0,84","0,95"],1,"10 là kỳ vọng, chuông đối xứng nên P=0,5."],
+[3,"Mẫu 2, 4, 6: trung bình mẫu bằng?",["3","4","5","6"],1,"(2+4+6)/3=4."],
+[3,"Mẫu 2, 4, 6: s² (hiệu chỉnh) bằng?",["8/3","4","8","2"],1,"Σ(xi−4)²=8, chia n−1=2 ⇒ 4."],
+[4,"Với σ đã biết, ước lượng khoảng cho trung bình dùng phân phối nào?",["Chuẩn tắc","Student","Khi bình phương","Fisher"],0,"σ đã biết ⇒ z; σ chưa biết, mẫu nhỏ ⇒ Student."],
+[4,"Muốn khoảng tin cậy hẹp hơn (các yếu tố khác giữ nguyên) ta nên?",["Tăng cỡ mẫu n","Giảm cỡ mẫu n","Tăng độ tin cậy","Tăng σ"],0,"ε=zσ/√n giảm khi n tăng."],
+[5,"Kiểm định hai phía, α=0,05, z=2,1. Kết luận?",["Bác bỏ H0","Chấp nhận H0","Không kết luận","Tăng α"],0,"|z|=2,1>1,96 ⇒ bác bỏ H0."],
+[5,"Giảm α (các yếu tố khác giữ nguyên) thì xác suất sai lầm loại II β thường?",["Tăng","Giảm","Không đổi","Bằng 0"],0,"α và β đánh đổi: giảm α thì β thường tăng."],
+[6,"Mẫu cặp được dùng khi nào?",["Hai mẫu độc lập","Hai lần đo trên cùng đối tượng","Chỉ khi n lớn","Khi phương sai bằng nhau"],1,"Mỗi đối tượng đo hai lần, phân tích hiệu từng cặp."],
+[6,"Khoảng tin cậy 95% của μ1−μ2 không chứa số 0. Điều này cho thấy?",["Có khác biệt có ý nghĩa ở mức 5%","Hai trung bình bằng nhau","Phải tăng cỡ mẫu","Không bác bỏ H0"],0,"CI không chứa 0 ⇒ bác bỏ H0: μ1=μ2 ở mức ý nghĩa 5%."]];
+function mk(c,t){const [q,a,w,e]=t(),f=v=>typeof v==="number"?F(v):v,A=f(a);let o=[...new Set(w.map(f))].filter(x=>x!==A);
+ for(let i=1;o.length<3;i++){const k=typeof a==="number"?F(a+0.1*i*(Math.abs(a)>=10?10:1)):"Không xác định "+i;if(k!==A&&!o.includes(k))o.push(k)}
+ const all=sh([A,...o.slice(0,3)]);return{c,q,o:all,a:all.indexOf(A),e}}
+function build(c){const g=(i)=>mk(c,TP[c][i]),st=STAT.filter(x=>x[0]===c).map(x=>{const A=x[2][x[3]],o=sh(x[2]);return{c,q:x[1],o,a:o.indexOf(A),e:x[4]}});
+ return[g(0),g(1),st[0],g(2),g(3),st[1],g(0),g(1),g(2),g(3)]}
+/*GEN-END*/
+const LOG={get(){try{return JSON.parse(LS.get("sv_log")||"[]")}catch(e){return[]}},add(r){const l=LOG.get();l.push(r);LS.set("sv_log",JSON.stringify(l.slice(-300)))}};
+const el=(t,txt,cls,fn)=>{const e=document.createElement(t);if(txt!=null)e.textContent=txt;if(cls)e.className=cls;if(fn)e.onclick=fn;return e};
+const stars=()=>+LS.get("sv_stars")||0;
+function gHome(){const b=$("#gbody");b.textContent="";$("#gstars").textContent=stars();
+ $("#gwel").textContent=window.fromSolve?"Cùng luyện tập thêm dạng bài bạn vừa học nhé!":"";window.fromSolve=false;
+ const g=el("div",null,"grid");CH.forEach((n,i)=>g.appendChild(el("button","Chương "+(i+1)+": "+n,"opt",()=>gPlay(i))));b.appendChild(g)}
+const ASK_SYS="Bạn là gia sư Xác suất Thống kê thân thiện. Trả lời tiếng Việt, tối đa 3 câu, đúng thuật ngữ, dễ nghe khi đọc thành tiếng. Công thức nếu cần viết trong \\( ... \\). Không markdown. Chỉ dựa trên câu hỏi ôn tập được cung cấp; nếu học sinh hỏi ngoài môn học thì mời quay lại Toán.";
+function askUI(q){const w=el("div",null,"card"),mic=el("button","🎤 Nói","btn g"),inp=el("input"),go=el("button","Hỏi AI","btn"),out=el("div",null,"msg");w.append(el("b","Em chưa hiểu chỗ nào?"));inp.placeholder="Gõ hoặc bấm micro, ví dụ: tại sao lại chia cho n−1?";
+ const ask=async t=>{if(!t.trim())return;out.textContent="AI đang suy nghĩ...";try{const a=await SM(ASK_SYS,[{role:"user",text:"Câu ôn tập: "+q.q+"\nĐáp án đúng: "+q.o[q.a]+"\nGiải thích: "+q.e+"\nHọc sinh hỏi: "+t}]);show(out,a);speak(a)}catch(e){out.textContent="Lỗi: "+e.message}};
+ go.onclick=()=>ask(inp.value);inp.onkeydown=e=>{if(e.key==="Enter")ask(inp.value)};
+ mic.onclick=()=>{if(!SR){out.textContent="Trình duyệt không hỗ trợ nhận dạng giọng nói, hãy gõ câu hỏi.";return}speechSynthesis.cancel();const r=new SR();r.lang="vi-VN";r.interimResults=true;mic.textContent="⏹ Đang nghe";let fin="";
+  r.onresult=ev=>{let t="";for(const x of ev.results)t+=x[0].transcript;inp.value=t;fin=t};r.onerror=ev=>{out.textContent=ev.error==="not-allowed"?"Chưa cấp quyền micro.":ev.error==="no-speech"?"Không nghe thấy, hãy nói lại.":"Lỗi micro: "+ev.error};
+  r.onend=()=>{mic.textContent="🎤 Nói";if(fin)ask(fin)};r.start();setTimeout(()=>{try{r.stop()}catch(e){}},15000)};
+ w.append(mic,inp,go,out);return w}
+function gPlay(c,list){const qs=list||build(c),b=$("#gbody");let k=0,got=0;
+ (function next(){speechSynthesis.cancel();b.textContent="";if(k>=qs.length){b.append(el("h3","Hoàn thành! Đúng "+got+"/"+qs.length+" câu, +"+got*5+" ⭐. Tổng hũ sao: "+stars()),el("button","Chọn chương khác","btn g",gHome),el("button","Xem Ôn tập","btn",()=>location.hash="#review"));$("#gstars").textContent=stars();return}
+  const q=qs[k];b.append(el("p","Chương "+(q.c+1)+" · Level "+(k+1)+"/"+qs.length,"tag"),el("h3",q.q));let done=false;const fb=el("div",null,"msg card"),os=[];
+  q.o.forEach((t,i)=>{const o=el("button",t,"opt",()=>{if(done)return;done=true;const ok=i===q.a;os.forEach(x=>x.disabled=true);
+   o.style.borderColor=ok?"var(--ok)":"var(--er)";os[q.a].style.borderColor="var(--ok)";
+   LOG.add({ts:new Date().toISOString(),c:q.c,q:q.q,o:q.o,a:q.a,e:q.e,ok});if(ok){got++;LS.set("sv_stars",stars()+5);$("#gstars").textContent=stars()}
+   fb.textContent=(ok?"✅ Đúng! +5 ⭐\n":"❌ Chưa đúng. Đáp án: "+q.o[q.a]+"\n")+"💡 "+q.e;b.append(fb,askUI(q),el("button",k+1<qs.length?"Đã hiểu → Câu tiếp theo":"Xem kết quả","btn",()=>{k++;next()}))});os.push(o);b.appendChild(o)})})()}
+function rHome(){const b=$("#rbody");b.textContent="";const l=LOG.get();
+ if(!l.length){b.append(el("p","Bạn chưa làm câu nào. Hãy chơi một chương để có dữ liệu ôn tập."),el("button","Chơi ngay","btn",()=>location.hash="#game"));return}
+ const by=CH.map((n,i)=>{const r=l.filter(x=>x.c===i);return{n,i,t:r.length,ok:r.filter(x=>x.ok).length}}).filter(x=>x.t);
+ b.appendChild(el("h3","Kết quả theo chương"));
+ by.forEach(x=>{const w=el("div");w.appendChild(el("div","Chương "+(x.i+1)+": "+x.n+" — đúng "+x.ok+"/"+x.t+" ("+Math.round(100*x.ok/x.t)+"%)"));
+  const bar=el("div"),f=el("div");bar.style.cssText="height:10px;border-radius:5px;background:rgba(255,255,255,.15);margin:4px 0 10px";f.style.cssText="height:100%;border-radius:5px;background:var(--ok);width:"+(100*x.ok/x.t)+"%";bar.appendChild(f);w.appendChild(bar);b.appendChild(w)});
+ const seen=new Set(),u=l.filter(x=>!x.ok&&!seen.has(x.q)&&seen.add(x.q)).filter(x=>!l.some(y=>y.q===x.q&&y.ok&&y.ts>x.ts));
+ b.appendChild(el("h3","Các câu bạn đã sai"));if(!u.length)b.appendChild(el("p","Không có câu sai chưa làm lại. Tuyệt vời!"));
+ u.slice(-15).forEach(x=>{const d=el("details");d.append(el("summary","Chương "+(x.c+1)+": "+x.q),el("p","Đáp án đúng: "+x.o[x.a]+"\n"+x.e,"msg"),el("button","Làm lại","btn",()=>{location.hash="#game";gPlay(x.c,[{c:x.c,q:x.q,o:x.o,a:x.a,e:x.e}])}));b.appendChild(d)});
+ const weak=by.slice().sort((a,c)=>a.ok/a.t-c.ok/c.t)[0];b.appendChild(el("h3","Gợi ý kế hoạch"));
+ b.appendChild(el("p",(l.length<5?"Dữ liệu còn ít (dưới 5 câu), nhận xét chỉ mang tính tham khảo. ":"")+"Chủ đề yếu nhất: Chương "+(weak.i+1)+" – "+weak.n+" ("+weak.ok+"/"+weak.t+"). Hôm nay: làm lại các câu sai không nhìn lời giải (15–20 phút). Sau 3 ngày: luyện lại chương này."));
+ b.append(el("button","Làm bài ngay","btn",()=>{location.hash="#game";gPlay(weak.i)}),el("button","Xóa dữ liệu ôn tập","btn g",()=>{if(confirm("Xóa toàn bộ lịch sử?")){LS.del("sv_log");LS.del("sv_stars");rHome()}}))}
+$("#yes").addEventListener("click",()=>{window.fromSolve=true});
+/* ===== Supabase: tài khoản + Diễn đàn dùng chung ===== */
+const SBJS="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";let fb={user:null},sb=null,cposts=[];const OPEN=new Set();
+const loadJs=u=>new Promise((ok,no)=>{const e=document.createElement("script");e.src=u;e.onload=ok;e.onerror=()=>no(new Error("Không tải được thư viện Supabase (kiểm tra mạng)."));document.head.appendChild(e)});
+function fbst(m,c){const e=$("#fbst");e.textContent=m;e.className="st "+(c||"")}
+function fbCfg(){try{const c=JSON.parse(LS.get("sv_sbcfg")||"null")||window.SV_SUPABASE_CONFIG;return c&&/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(c.url||"")&&c.key?{url:c.url.replace(/\/$/,""),key:c.key}:null}catch(e){return null}}
+function badKey(k){if(/^sb_secret_/.test(k))return true;try{return JSON.parse(atob(k.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).role==="service_role"}catch(e){return false}}
+const AERR={"invalid login credentials":"Sai email hoặc mật khẩu.","user already registered":"Email đã được đăng ký.","email not confirmed":"Email chưa được xác nhận, hãy kiểm tra hộp thư.","password should be":"Mật khẩu quá yếu (cần ≥ 6 ký tự).","rate limit":"Gửi email quá nhiều, hãy đợi một lúc.","invalid format":"Email không hợp lệ.","failed to fetch":"Lỗi mạng hoặc dự án Supabase đang tạm dừng."};
+const aerr=e=>{const m=(e.message||"").toLowerCase();for(const k in AERR)if(m.includes(k))return AERR[k];return e.message||"Lỗi không xác định"};
+const cloud=()=>!!(sb&&fb.user),uname=()=>fb.user.displayName||(fb.user.email||"").split("@")[0];
+let ldT;const ld=()=>{clearTimeout(ldT);ldT=setTimeout(load,250)};
+async function load(){if(!fb.user)return;const{data,error}=await sb.from("posts").select("id,uid,author,t,c,img,ts,replies(id,uid,author,t,ts)").order("ts",{ascending:false}).limit(50);
+ if(error){fbst("Không đọc được Diễn đàn: "+error.message+" (đã chạy supabase-setup.sql chưa?)","er");return}
+ cposts=data.map(p=>({id:p.id,uid:p.uid,by:p.author,t:p.t,c:p.c,img:p.img||"",ts:new Date(p.ts).getTime(),rep:(p.replies||[]).sort((a,b)=>new Date(a.ts)-new Date(b.ts)).map(r=>({by:r.author,t:r.t,uid:r.uid}))}));
+ if($("#forum").classList.contains("on"))fList()}
+async function cPost(t,c,img){const{error}=await sb.from("posts").insert({author:uname(),t,c,img:img||null});if(error)throw error;await load()}
+async function cReply(id,t){const{error}=await sb.from("replies").insert({post_id:id,author:uname(),t});if(error)throw error;await load()}
+async function cDel(id){const{error}=await sb.from("posts").delete().eq("id",id);if(error)throw error;await load()}
+async function fbInit(){const cfg=fbCfg();if(!cfg)return false;if(badKey(cfg.key))throw new Error("Đây là KHÓA BÍ MẬT (secret/service_role). Không dùng! Hãy dùng publishable hoặc anon key.");
+ if(!window.supabase)await loadJs(SBJS);sb=window.supabase.createClient(cfg.url,cfg.key);
+ const setU=u=>{if(u&&fb.user&&fb.user.uid===u.id){fb.user.displayName=u.user_metadata?.name||fb.user.displayName;uiAuth();return}
+  fb.user=u?{uid:u.id,email:u.email,displayName:u.user_metadata?.name||""}:null;cposts=[];uiAuth();if(fb.user)load();else if($("#forum").classList.contains("on"))fList()};
+ sb.auth.onAuthStateChange((_e,se)=>setU(se?.user||null));const{data}=await sb.auth.getSession();setU(data.session?.user||null);
+ sb.channel("forum").on("postgres_changes",{event:"*",schema:"public",table:"posts"},ld).on("postgres_changes",{event:"*",schema:"public",table:"replies"},ld).subscribe();return true}
+function uiAuth(){const has=!!fbCfg();$("#fbauth").hidden=!has||cloud();$("#fbme").hidden=!cloud();
+ $("#fbBtn").textContent=cloud()?"☁️ "+uname():"☁️ Tài khoản";
+ $("#fbinfo").textContent=!has?"Chưa cấu hình Supabase. Diễn đàn đang chạy ở chế độ cục bộ (chỉ trên máy này).":cloud()?"":"Đã có cấu hình. Đăng nhập hoặc đăng ký để dùng Diễn đàn chung.";
+ if(cloud())$("#fbwho").textContent="Đang đăng nhập: "+uname()+" ("+fb.user.email+")";$("#fbcfgbox").open=!has}
+$("#fbBtn").onclick=()=>{const c=fbCfg();$("#sburl").value=c?c.url:"";$("#sbkey").value=c?c.key:"";uiAuth();fbst("");$("#fbmodal").classList.add("on")};$("#fbx").onclick=()=>$("#fbmodal").classList.remove("on");
+$("#fbcsave").onclick=async()=>{const url=$("#sburl").value.trim(),key=$("#sbkey").value.trim();
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url))return fbst("Project URL phải dạng https://xxxx.supabase.co","er");if(!key)return fbst("Hãy dán khóa công khai.","er");
+ if(badKey(key))return fbst("Đây là khóa BÍ MẬT. Không dùng! Hãy dùng publishable hoặc anon key.","er");
+ LS.set("sv_sbcfg",JSON.stringify({url,key}));fbst("Đang kết nối...");try{if(sb){location.reload();return}await fbInit();uiAuth();fbst("Đã kết nối. Hãy đăng nhập hoặc đăng ký.","ok")}catch(e){fbst(e.message,"er")}};
+$("#fbcdel").onclick=()=>{LS.del("sv_sbcfg");fbst("Đã xóa cấu hình, đang tải lại...");setTimeout(()=>location.reload(),500)};
+const need=()=>{if(!sb){fbst("Chưa kết nối Supabase.","er");return false}return true};
+$("#fbin").onclick=async()=>{if(!need())return;fbst("Đang đăng nhập...");const{error}=await sb.auth.signInWithPassword({email:$("#fbmail").value.trim(),password:$("#fbpass").value});if(error)return fbst(aerr(error),"er");$("#fbpass").value="";fbst("Đăng nhập thành công.","ok")};
+$("#fbup").onclick=async()=>{if(!need())return;const n=$("#fbname").value.trim().slice(0,30);if(!n)return fbst("Hãy nhập tên hiển thị.","er");fbst("Đang đăng ký...");
+ const{data,error}=await sb.auth.signUp({email:$("#fbmail").value.trim(),password:$("#fbpass").value,options:{data:{name:n}}});if(error)return fbst(aerr(error),"er");$("#fbpass").value="";
+ fbst(data.session?"Đăng ký thành công.":"Đã gửi email xác nhận: hãy bấm liên kết trong email rồi quay lại đăng nhập.","ok")};
+$("#fbreset").onclick=async()=>{if(!need())return;const m=$("#fbmail").value.trim();if(!m)return fbst("Nhập email trước.","er");const{error}=await sb.auth.resetPasswordForEmail(m,{redirectTo:location.origin});fbst(error?aerr(error):"Đã gửi email đặt lại mật khẩu (nếu email tồn tại).",error?"er":"ok")};
+$("#fbout").onclick=()=>sb&&sb.auth.signOut();
+fbInit().then(uiAuth).catch(e=>{console.warn(e);uiAuth();fbst(e.message,"er")});
+
+/* ===== Diễn đàn (cloud khi đã đăng nhập, cục bộ nếu chưa) ===== */
+const FOR={get(){try{return JSON.parse(LS.get("sv_forum")||"[]")}catch(e){return[]}},set(l){LS.set("sv_forum",JSON.stringify(l))}};
+let fImg="";
+SYM.forEach(([l,t])=>{const b=el("button",l);b.type="button";b.onclick=()=>{const a=$("#fbody");a.setRangeText("\\("+t+"\\)",a.selectionStart,a.selectionEnd,"end");a.focus();fPrev()};$("#ftb").appendChild(b)});
+function fPrev(){show($("#fprev"),($("#ftitle").value?$("#ftitle").value+"\n\n":"")+($("#fbody").value||"(Chưa có nội dung)"))}
+function fRead(f){if(!f||!/^image\//.test(f.type))return;if(f.size>400e3){alert("Ảnh quá 400KB, hãy cắt nhỏ bớt.");return}const r=new FileReader();r.onload=()=>{fImg=r.result;$("#fimg").src=fImg;$("#fimg").hidden=false};r.readAsDataURL(f)}
+$("#fbody").onpaste=e=>{const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image/"));if(it){e.preventDefault();fRead(it.getAsFile())}};
+$("#ffile").onchange=e=>fRead(e.target.files[0]);$("#fbody").oninput=$("#ftitle").oninput=fPrev;
+const who=()=>{if(cloud())return uname();let n=LS.get("sv_name");if(!n){n=(prompt("Tên hiển thị của bạn:")||"").trim().slice(0,30)||"Ẩn danh";LS.set("sv_name",n)}return n};
+const fClear=()=>{$("#ftitle").value=$("#fbody").value="";fImg="";$("#fimg").hidden=true;fPrev()};
+$("#fpost").onclick=async()=>{const t=$("#ftitle").value.trim(),c=$("#fbody").value.trim();if(!t||!c){alert("Hãy nhập tiêu đề và nội dung.");return}
+ if(t.length>200||c.length>5000){alert("Tiêu đề tối đa 200 ký tự, nội dung tối đa 5000 ký tự.");return}
+ if(cloud()){try{await cPost(t,c,fImg);fClear()}catch(e){alert("Không đăng được: "+(e.message||e))}return}
+ const l=FOR.get();l.unshift({id:Date.now(),t,c,img:fImg,by:who(),ts:Date.now(),rep:[]});FOR.set(l);fClear();fList()};
+function fList(){const box=$("#flist");box.textContent="";const m=$("#fmode");
+ m.textContent=cloud()?"☁️ Diễn đàn chung (thời gian thực) — bạn đang là "+uname()+".":fbCfg()?"Bạn chưa đăng nhập: đang xem Diễn đàn cục bộ trên máy này. Bấm ☁️ Tài khoản để đăng nhập và dùng Diễn đàn chung.":"Chế độ cục bộ: bài lưu trên máy này. Cấu hình Supabase ở nút ☁️ Tài khoản để dùng chung với bạn bè.";
+ const l=cloud()?cposts:FOR.get();if(!l.length){box.appendChild(el("p","Chưa có bài đăng nào. Hãy đặt câu hỏi đầu tiên!"));return}
+ l.forEach(p=>{const card=el("div",null,"card"),w=el("div",null,"fwrap"),body=el("div"),fit=()=>{if(w.style.maxHeight&&w.style.maxHeight!=="0px"&&w.style.maxHeight!=="none")w.style.maxHeight=w.scrollHeight+"px"};
+  card.append(el("h3",p.t),el("div",p.by+" · "+new Date(p.ts).toLocaleString("vi-VN")+" · "+p.rep.length+" trả lời","tag"));
+  const c=el("div",null,"msg");show(c,p.c);body.appendChild(c);if(p.img&&/^data:image\//.test(p.img)){const im=el("img");im.src=p.img;im.className="pv";im.onload=fit;body.appendChild(im)}
+  const rl=el("div"),drawR=()=>{rl.textContent="";p.rep.forEach(r=>{const d=el("div",null,"msg card");show(d,r.by+": "+r.t);rl.appendChild(d)});fit()};drawR();
+  const ri=el("input");ri.placeholder="Viết câu trả lời...";
+  const rb=el("button","Trả lời","btn",async()=>{const t=ri.value.trim();if(!t)return;if(t.length>2000){alert("Tối đa 2000 ký tự.");return}
+   if(cloud()){try{await cReply(p.id,t);ri.value=""}catch(e){alert("Không gửi được: "+(e.message||e))}return}
+   const all=FOR.get(),q=all.find(x=>x.id===p.id);q.rep.push({by:who(),t});p.rep=q.rep;FOR.set(all);ri.value="";drawR()});
+  const ai=el("div",null,"msg"),ab=el("button","🤖 AI STATVERSE gợi ý","btn g",async()=>{ab.disabled=true;ai.textContent="AI đang soạn gợi ý...";fit();try{const a=await SM(SOLVE_SYS.split("BẮT BUỘC")[0]+"Hãy gợi ý hướng giải ngắn gọn cho bài đăng diễn đàn (không bắt buộc dùng cấu trúc 4 phần). Nói rõ đây là gợi ý của AI, cần tự kiểm chứng.",[{role:"user",text:p.t+"\n"+p.c}]);show(ai,a)}catch(e){ai.textContent="Lỗi: "+e.message}ab.disabled=false;fit()});
+  body.append(rl,ri,rb,ab);
+  const mine=cloud()?p.uid===fb.user.uid:true;
+  if(mine)body.appendChild(el("button","Xóa bài","btn g",async()=>{if(!confirm("Xóa bài này?"))return;if(cloud()){try{await cDel(p.id)}catch(e){alert("Không xóa được: "+(e.message||e))}}else{FOR.set(FOR.get().filter(x=>x.id!==p.id));fList()}}));
+  body.appendChild(ai);w.appendChild(body);
+  const ch=el("button","▼","chev",()=>{const open=w.style.maxHeight&&w.style.maxHeight!=="0px";if(open){w.style.maxHeight="0px";ch.classList.remove("up");OPEN.delete(p.id)}else{w.style.maxHeight=w.scrollHeight+"px";ch.classList.add("up");OPEN.add(p.id)}});ch.setAttribute("aria-label","Mở/thu gọn");
+  if(OPEN.has(p.id)){w.style.maxHeight="none";ch.classList.add("up")}
+  card.append(w,ch);box.appendChild(card)})}
+
+route();prev();
+</script>
+</body>
+</html>
